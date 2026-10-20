@@ -58,9 +58,15 @@ footer a { display: inline-block; padding: 0.6rem 0; }
 	.jump ul { flex-wrap: wrap; overflow: visible; }
 }
 
-/* Header eagle: a round portrait beside the title. */
-.hero-top { display: flex; align-items: center; gap: 1rem; }
-.eagle { flex: none; width: 88px; height: 88px; border-radius: 50%; border: 3px solid var(--white); box-shadow: 0 0 0 2px var(--blue); object-fit: cover; }
+/* Eagle banner across the top, at its own 2000:720 shape up to 1280px wide.
+   Wider screens see the photo's flat sky colour either side; phones keep at
+   least 150px of height and lose a little sky at the sides, not the eagle. */
+.banner-wrap { background: #c9cbdb; border-bottom: 4px solid var(--blue); }
+.banner { display: block; width: 100%; max-width: 1280px; height: auto; min-height: 150px; margin: 0 auto; aspect-ratio: 2000 / 720; object-fit: cover; object-position: 62% 45%; }
+@media (min-width: 1281px) {
+	/* Fade the photo's edges into the sky colour so there is no seam. */
+	.banner { -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+}
 
 /* Cards with a photo: photo on top on phones, at the left from 601px. The card's
    own padding is cancelled so the photo runs edge to edge. */
@@ -77,6 +83,5 @@ footer a { display: inline-block; padding: 0.6rem 0; }
 	.hero { padding-top: 1.75rem; padding-bottom: 1rem; }
 	.item { padding: 0.85rem 0.9rem; }
 	.photo { width: calc(100% + 1.8rem); margin: -0.85rem -0.9rem 0.75rem; }
-	.eagle { width: 72px; height: 72px; }
 	h2 { margin-top: 1.6rem; }
 }

@@ -29,6 +29,10 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- A full-width photo of a bald eagle in flight now runs across the top of the page, replacing the
+  small round eagle portrait beside the title. Its shape is fixed up to 1280px. Wider screens get
+  the photo's sky colour either side, with feathered edges; phones keep at least 150px of height.
+  A browser test checks it at every width (DECISIONS #9).
 - The header no longer says "4 items confirmed · 6 under consideration". It now reads "4 items are
   in the package. 6 more are ideas still being decided, each marked [Idea]." A browser test keeps
   both numbers in step with the cards.

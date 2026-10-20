@@ -20,7 +20,8 @@ const json = (f) => JSON.parse(read(f));
 const ITEMS_DIR = 'src/content/items';
 const IMAGE_BUDGET_KB = 120;
 const CARD_SIZE = [800, 600];
-const EAGLE_SIZE = [320, 320];
+const BANNER = 'src/assets/eagle-banner.webp';
+const BANNER_SIZE = [2000, 720];
 const HOLDER = 'Pieter de Jong';
 
 // Minimal frontmatter reader: the item files use flat keys plus one nested `link`.
@@ -117,11 +118,11 @@ async function content() {
 	try { sharp = (await import('sharp')).default; } catch { skip('sharp not installed; image dimensions not checked'); }
 
 	const assets = [
-		'src/assets/eagle.webp',
+		BANNER,
 		...readdirSync('src/assets/items').filter((f) => !f.startsWith('.')).map((f) => `src/assets/items/${f}`),
 	];
 	const referenced = new Set(list.filter((i) => i.image).map((i) => join(ITEMS_DIR, i.image)));
-	referenced.add('src/assets/eagle.webp');
+	referenced.add(BANNER);
 	for (const r of referenced) if (!existsSync(r)) fail(`referenced image missing: ${r}`);
 
 	for (const a of assets) {
@@ -133,7 +134,7 @@ async function content() {
 		if (kb > IMAGE_BUDGET_KB) problems.push(`${kb} KB > ${IMAGE_BUDGET_KB} KB`);
 		if (sharp) {
 			const { width, height } = await sharp(a).metadata();
-			const [w, h] = a.endsWith('eagle.webp') ? EAGLE_SIZE : CARD_SIZE;
+			const [w, h] = a === BANNER ? BANNER_SIZE : CARD_SIZE;
 			if (width !== w || height !== h) problems.push(`${width}x${height}, expected ${w}x${h}`);
 		}
 		problems.length ? fail(`${a}: ${problems.join('; ')}`) : pass(`${a} (${kb} KB)`);

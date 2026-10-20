@@ -4,7 +4,7 @@ import { getCollection, render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import { CATEGORIES, type Category } from '../consts';
-import eagle from '../assets/eagle.webp';
+import eagleBanner from '../assets/eagle-banner.webp';
 
 const items = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
 const groups = (Object.keys(CATEGORIES) as Category[])
@@ -17,14 +17,20 @@ const ideas = items.length - confirmed;
 	title="Patriot Package — an American heritage gift"
 	description="A gift package for America's 250th: founding documents, history, coins and keepsakes."
 >
+	<div class="banner-wrap">
+		<Image
+			src={eagleBanner}
+			alt="A bald eagle in flight"
+			widths={[640, 1280, 2000]}
+			sizes="(max-width: 1280px) 100vw, 1280px"
+			loading="eager"
+			fetchpriority="high"
+			class="banner"
+		/>
+	</div>
 	<header class="hero wrap">
-		<div class="hero-top">
-			<Image src={eagle} alt="A bald eagle" width={160} height={160} class="eagle" loading="eager" />
-			<div>
-				<p class="eyebrow">1776 – 2026</p>
-				<h1>Patriot Package</h1>
-			</div>
-		</div>
+		<p class="eyebrow">1776 – 2026</p>
+		<h1>Patriot Package</h1>
 		<p class="lede">A gift package for America's 250th: founding documents, history, coins and keepsakes.</p>
 		<p class="count" data-testid="count">
 			<strong>{confirmed} {confirmed === 1 ? 'item is' : 'items are'} in the package.</strong>

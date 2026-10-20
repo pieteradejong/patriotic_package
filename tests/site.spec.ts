@@ -83,9 +83,9 @@ test('photos load, have alt text and fit their card', async ({ page }) => {
 		expect(box.x).toBeGreaterThanOrEqual(card.x - 1);
 		expect(box.x + box.width).toBeLessThanOrEqual(card.x + card.width + 1);
 	}
-	const eagle = page.locator('img.eagle');
-	await expect(eagle).toHaveAttribute('alt', 'A bald eagle');
-	await expect.poll(() => eagle.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
+	const banner = page.locator('img.banner');
+	await expect(banner).toHaveAttribute('alt', 'A bald eagle in flight');
+	await expect.poll(() => banner.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
 });
 
 test('every item links out over https', async ({ page }) => {
@@ -102,4 +102,14 @@ test('the header counts match the cards and explain the Idea badge', async ({ pa
 	const count = page.getByTestId('count');
 	await expect(count).toContainText(`${inPackage} items are in the package.`);
 	await expect(count).toContainText(`${ideas} more are ideas still being decided, each marked Idea.`);
+});
+
+test('the eagle banner spans the top of the page', async ({ page }) => {
+	await page.goto('/');
+	await expect(page.locator('img.banner')).toBeVisible();
+	const banner = (await page.locator('.banner-wrap').boundingBox())!;
+	const width = page.viewportSize()!.width;
+	expect(banner.width).toBeGreaterThanOrEqual(width - 1);
+	expect(banner.y).toBeLessThan(20);
+	expect(banner.height).toBeGreaterThanOrEqual(150);
 });

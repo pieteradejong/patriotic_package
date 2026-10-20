@@ -150,3 +150,19 @@ Rejected: the outbound check on every push. It is the same reason as in #7.
   - a card URL changed to `…federalist-paperz`: `card links differ from the item files`, and
     `404 https://guides.loc.gov/federalist-paperz`
 - `links.yml` run 39468086901 (workflow_dispatch on `a25afd6`) → success, `130 passed, 0 failed, 1 warnings, 4 skipped`. Per-push `site`, `security` and post-deploy `live` → success.
+
+## 9. An eagle banner across the top replaces the round portrait
+**Date:** 2026-10-20
+**Context:** Pieter asked for an eagle at the top. The 88px round portrait beside the title read
+as too small.
+**Decision:** A full-width banner of a bald eagle in flight: USFWS, public domain, 2000×720 WebP,
+17 KB. It keeps its shape up to 1280px; beyond that the sky colour (`#c9cbdb`) fills both sides and
+the photo's edges are faded in, so the eagle never grows past about 460px tall. On phones it keeps
+at least 150px of height and loses sky at the sides, not the eagle. The portrait is removed:
+two eagles at the top would compete. Rejected:
+- A bigger portrait above the title.
+- An SVG emblem in the top stripe.
+- The Great Seal: its display is restricted, as in #6.
+**Verified:** `./test.sh` → `132 passed, 0 failed`, including `the eagle banner spans the top of
+the page` at 1280, 375 and 320px and `src/assets/eagle-banner.webp (17 KB)`. Screenshots at 375,
+1280 and 1920px show the whole eagle, wingtips to tail, with no seam at 1920.
