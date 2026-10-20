@@ -44,10 +44,18 @@ push to `main`.
   would have deployed the wrong directory.
 - **Output:** fully static. Add the `@astrojs/vercel` adapter only when a page needs server
   rendering.
+- **GitHub Deployments:** `gitProviderOptions.createDeployments` must be `enabled` (it is), or
+  `deployment_status` never fires and the `live` job never runs. A project created by the CLI
+  starts with it `disabled`. Check with
+  `vercel api /v9/projects/patriot-package | jq .gitProviderOptions`.
+- **Branch protection:** `main` requires `tests`, `security / gitleaks` and `security / gate`. Admins
+  are exempt, so direct pushes still deploy (`docs/DECISIONS.md` #4).
+- **Preview URLs** sit behind Vercel login (`ssoProtection: all_except_custom_domains`). The
+  production alias is public.
 - **Environment variables:** none.
 - **Analytics:** Vercel Web Analytics (cookie-less), via `<Analytics />` in `src/layouts/Base.astro`.
-  It needs Web Analytics turned on for the project; until then, `test.sh --live` warns that the
-  script is not served.
+  If Web Analytics is ever turned off for the project, `test.sh --live` warns that the script is
+  not served.
 - **Node:** `engines` `22.x` in `package.json` decides the version on Vercel; CI reads `.nvmrc`.
   Change both together.
 - **Local link:** `vercel link` writes `.vercel/` (gitignored), which only the CLI needs.

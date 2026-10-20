@@ -15,4 +15,5 @@ The site is unversioned (every push to `main` deploys).
 - Deployment to https://patriot-package.vercel.app through Vercel's Git integration, with preview
   URLs for branches and pull requests. CI workflow `site` runs the tests on every push and PR and
   checks the live site after each production deploy. `security` runs gitleaks and the gate
-  (DECISIONS #2). Build settings are pinned in `vercel.json`.
+  (DECISIONS #2). Build settings are pinned in `vercel.json`. `main` requires the CI
+  checks (DECISIONS #4).

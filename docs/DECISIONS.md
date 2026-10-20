@@ -32,7 +32,18 @@ gitleaks + gate workflow.
 Rejected: `vercel deploy --prebuilt` from Actions with a `VERCEL_TOKEN` secret. It gates the deploy
 on the tests, but it puts a long-lived deploy token in GitHub and duplicates what the integration
 does. Branch protection gives the same gate for pull requests.
-**Verified:** NOT YET — needs the first push, the production deployment and a green `live` job.
+The CLI created the project with `gitProviderOptions.createDeployments: disabled`. With that
+setting Vercel posts commit statuses but no GitHub Deployments, so `deployment_status` never fires
+and `live` never runs on its own. It is now `enabled`, the same as `padj`.
+**Verified:** PARTIAL, 2026-10-20:
+- Push `7642e36` → `vercel ls patriot-package` showed `● Ready  Production`, and
+  `curl -sI https://patriot-package.vercel.app` → `HTTP/2 200`.
+- `site/tests` run 39419198454 → success. `security / gitleaks` and `security / gate` → success.
+- `./test.sh --live https://patriot-package.vercel.app` → `17 passed, 0 failed, 0 warnings,
+  0 skipped`, including `live site is built from 7642e36…`.
+- `live` job by `workflow_dispatch` (run 39419382119) → success.
+- `vercel api /v9/projects/patriot-package` → `"createDeployments":"enabled"`.
+- Still to see: a `live` run started by `deployment_status` on the next push (TODO.md).
 
 ## 3. CC0 covers the code as well as the list
 **Date:** 2026-10-20
@@ -44,3 +55,14 @@ LICENSE starts with CC0's dedication notice naming Pieter de Jong, because the p
 requires the canonical holder (`license-holder`) and the bare legal code names nobody.
 **Verified:** `head -1 LICENSE` → `To the extent possible under law, Pieter de Jong has waived …`;
 `grep -c 'CC0 1.0 Universal' LICENSE` → `2`; `jq -r .license package.json` → `CC0-1.0`.
+
+## 4. Required checks on `main`, with admins exempt
+**Date:** 2026-10-20
+**Context:** Branch protection gates pull requests on CI. Pieter also pushes straight to `main`.
+**Decision:** `main` requires `tests`, `security / gitleaks` and `security / gate`, and blocks force
+pushes and deletion. `enforce_admins` is off, so Pieter's direct pushes still land and deploy, and
+the checks run on them afterwards. Rejected:
+- `enforce_admins` on: every change would need a PR, which is too heavy for one person editing a list.
+- Requiring `live`: it runs after the deploy, so it cannot gate one.
+**Verified:** `gh api repos/pieteradejong/patriotic_package/branches/main/protection` →
+`{"admins":false,"checks":["tests","security / gitleaks","security / gate"],"force":false}`.
