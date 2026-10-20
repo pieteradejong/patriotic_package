@@ -40,5 +40,7 @@ does. Branch protection gives the same gate for pull requests.
 **Decision:** Keep CC0-1.0 for everything. The code is small and has nothing worth protecting with
 attribution. Rejected: MIT for the code and CC0 for the content, which means two licenses for a
 repo this size.
-**Verified:** `head -3 LICENSE` → `Creative Commons Legal Code` / `CC0 1.0 Universal`;
-`jq -r .license package.json` → `CC0-1.0`.
+LICENSE starts with CC0's dedication notice naming Pieter de Jong, because the public-repo gate
+requires the canonical holder (`license-holder`) and the bare legal code names nobody.
+**Verified:** `head -1 LICENSE` → `To the extent possible under law, Pieter de Jong has waived …`;
+`grep -c 'CC0 1.0 Universal' LICENSE` → `2`; `jq -r .license package.json` → `CC0-1.0`.
