@@ -107,3 +107,18 @@ They are not fetched by CI.
   en.wikipedia.org.
 - `./test.sh`: `photos load, have alt text and fit their card` and `every item links out over https`
   pass at all three widths.
+
+## 7. The outbound link check runs on demand, not in CI
+**Date:** 2026-10-20
+**Context:** `./test.sh` gained a check that every product link and image source answers. CI could
+run it on every push.
+**Decision:** It sits behind `./test.sh --network` and does not run in CI. Three of the
+official hosts (usmint.gov ×2, america250.org) answer automated requests with a Cloudflare
+challenge, and any third-party outage would fail an unrelated push. Challenged hosts are reported
+as SKIP with a reason, never as PASS. Rejected:
+- In CI on every push: it fails on someone else's outage.
+- A weekly scheduled job like astropieter's link report: worth adding once the list stops
+  changing (TODO.md).
+**Verified:** `./test.sh --quick --network`: 17 links `200`, 3 `SKIP … answers a bot challenge`,
+0 failed. Its first run found four `CREDITS.md` links broken by unencoded parentheses (404), which
+are now fixed.

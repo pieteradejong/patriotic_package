@@ -26,12 +26,33 @@ build. Prefix a file name with `_` to keep it as a draft.
 ## Commands
 
 ```bash
-./init.sh                 # check Node ≥22.12, npm ci
+./init.sh                 # toolchain check, npm ci (only if stale), test browser, Astro types; --clean, --test
 ./run.sh                  # dev server on http://localhost:4321/
 ./run.sh build            # production build into dist/
-./test.sh                 # build + every check + browser tests (what CI runs)
+./run.sh lint             # shellcheck + astro check
+./test.sh                 # every check (what CI runs): ~100 checks in ~20s
+./test.sh --quick         # static checks only, no build or browser
+./test.sh --network       # also check every outbound link
 ./test.sh --live https://patriot-package.vercel.app   # check the deployed site
 ```
+
+### What `./test.sh` checks
+
+| Section | Checks |
+|---|---|
+| Environment | Node ≥ 22.12, and the same major as `.nvmrc` (warns otherwise) |
+| Dependencies | `package.json`, `package-lock.json` and `node_modules` agree |
+| Scripts | executable, `#!/usr/bin/env bash`, parse under macOS bash 3.2, `--help`, shellcheck `-S warning` |
+| Config | exact pins, `.nvmrc` matches `engines`, CC0 LICENSE naming the holder, `vercel.json`, Actions pinned by SHA, security workflow |
+| Content | every item has an https link; every image is used, WebP, the right size, ≤ 120 KB and in `CREDITS.md` as public domain or CC0 |
+| Repository hygiene | no `.env`, build output, media or raw JPEG/PNG in git; no file over 1 MB |
+| Type-check | `astro check` |
+| Build and output | `astro build`, every item rendered, 400w/800w `srcset`, lazy photos, width and height on every `img` |
+| Meta, contrast, weight | canonical, Open Graph, `theme-color`, build commit; WCAG AA for every colour pair; 100 KB HTML+CSS+JS budget |
+| Browser | Playwright at 1280, 375 and 320px: items, console errors, horizontal scroll, 404, tap targets, jump nav, badges, photos, links |
+| Network (`--network`) | every product link and `CREDITS.md` source answers; Cloudflare-challenged hosts are skipped with a reason |
+
+`scripts/checks.mjs` holds the Dependencies, Config, Content and Network checks.
 
 ## How a change ships
 

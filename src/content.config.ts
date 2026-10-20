@@ -17,7 +17,7 @@ const items = defineCollection({
 		image: image().optional(),
 		imageAlt: z.string().optional(),
 		// Where to read about it or get it. Official sources only; check the URL resolves.
-		link: z.object({ url: z.string().url(), label: z.string().min(1) }).optional(),
+		link: z.object({ url: z.url({ protocol: /^https$/ }), label: z.string().min(1) }).optional(),
 		source: z.string().optional(),
 		priceUsd: z.number().positive().optional(),
 	}).refine((d) => !d.image || !!d.imageAlt, { message: 'an item with an image needs imageAlt' }),

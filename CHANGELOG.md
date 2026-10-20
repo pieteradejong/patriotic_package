@@ -29,11 +29,22 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- `./test.sh` now covers dependencies against the lockfile, the scripts themselves (bash 3.2,
+  shellcheck, `--help`), config (pins, Node versions, license, `vercel.json`, Action SHAs), content
+  and image rules against `CREDITS.md`, `astro check`, image output (`srcset`, lazy loading,
+  dimensions) and media hygiene. Every section runs even after an earlier one fails, and the
+  summary names the sections that failed. New flags: `--quick` and `--network` (DECISIONS #7).
+- `./init.sh` is idempotent. It reuses `node_modules` while it matches the lockfile, installs the
+  Playwright browser when there is no Chrome, generates Astro's types and checks for shellcheck.
+  New flags: `--clean` and `--test`. `./run.sh` gains `lint` and `type-check`.
+- Link schema: item links must be https (`z.url`).
 - The "Idea" badge sits above the title on every card, instead of inline or wrapped depending on
   title length. Phones get less hero and card padding.
 - Item frontmatter: `buyUrl` is replaced by `link` (`url` and `label`). `image` and `imageAlt` are
   new.
 
 ### Fixed
+- Four Commons links in `CREDITS.md` contained parentheses and broke in Markdown; they are now
+  percent-encoded. Found by `./test.sh --network`.
 - The footer link was 16px tall on phones, below WCAG 2.5.8's 24px minimum target size; it is now
   44px.
