@@ -35,7 +35,7 @@ does. Branch protection gives the same gate for pull requests.
 The CLI created the project with `gitProviderOptions.createDeployments: disabled`. With that
 setting Vercel posts commit statuses but no GitHub Deployments, so `deployment_status` never fires
 and `live` never runs on its own. It is now `enabled`, the same as `padj`.
-**Verified:** PARTIAL, 2026-10-20:
+**Verified:** 2026-10-20:
 - Push `7642e36` → `vercel ls patriot-package` showed `● Ready  Production`, and
   `curl -sI https://patriot-package.vercel.app` → `HTTP/2 200`.
 - `site/tests` run 39419198454 → success. `security / gitleaks` and `security / gate` → success.
@@ -43,7 +43,8 @@ and `live` never runs on its own. It is now `enabled`, the same as `padj`.
   0 skipped`, including `live site is built from 7642e36…`.
 - `live` job by `workflow_dispatch` (run 39419382119) → success.
 - `vercel api /v9/projects/patriot-package` → `"createDeployments":"enabled"`.
-- Still to see: a `live` run started by `deployment_status` on the next push (TODO.md).
+- Push `e333c03` → GitHub deployment `Production e333c03`. `site` run 39419777772, started by
+  `deployment_status`: `live success`. `site` (push) and `security` (push) → success.
 
 ## 3. CC0 covers the code as well as the list
 **Date:** 2026-10-20
