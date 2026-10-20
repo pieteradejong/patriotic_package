@@ -113,7 +113,11 @@ test('the eagle banner spans the page directly under the bunting', async ({ page
 	// Directly under the bunting, nothing in between.
 	const bunting = (await page.locator('.bunting').boundingBox())!;
 	expect(Math.abs(banner.y - (bunting.y + bunting.height))).toBeLessThanOrEqual(1);
-	expect(banner.height).toBeGreaterThanOrEqual(150);
+	// Short band: 130px on phones, at most 260px (+4px border) on desktop.
+	expect(banner.height).toBeGreaterThanOrEqual(130);
+	expect(banner.height).toBeLessThanOrEqual(265);
+	// The whole photo is shown, never cropped (contain letterboxes onto the sky colour).
+	await expect(page.locator('img.banner')).toHaveCSS('object-fit', 'contain');
 });
 
 test('bunting hangs across the top of every page', async ({ page, request }) => {

@@ -6,4 +6,4 @@
 - [ ] Pick the actual "250 Years of American History" book, then add its cover (if licensable) and a buy link, 2026-10-20 — docs/DECISIONS.md #6
 - [x] Add a weekly scheduled `./test.sh --network` job (like astropieter's link report) once the item list settles, 2026-10-20 — docs/DECISIONS.md #7
 - [ ] Open the three Cloudflare-blocked links in a browser and confirm each page is right (usmint.gov American Eagle coins, usmint.gov proof sets, america250.org About), 2026-10-20 — docs/DECISIONS.md #8
-- [ ] Answer the package-builder open questions (business or gift guide, who fulfils, presets, price ceiling, Capitol flag, branding), then pick option A–D, 2026-10-20 — docs/package-builder.md § Open questions
+- [ ] Answer the open questions in docs/shoppable.md (affiliate links, concierge fee, shops per item, claim link, delivery promise) and docs/package-builder.md (presets, price ceiling, Capitol flag, box), then pick the first step, 2026-10-20 — docs/shoppable.md § Suggested path

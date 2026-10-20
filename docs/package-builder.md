@@ -1,7 +1,7 @@
 # Package builder — ideas
 
 Status: **ideation, nothing built.** This is a working document for deciding *whether* and *how* to
-let people put together and order their own Patriot Package. Decisions that come out of it go in
+let people put together their own Patriot Package. Decisions that come out of it go in
 `docs/DECISIONS.md`; open questions are listed at the end and tracked in `TODO.md`.
 
 ## The idea in one paragraph
@@ -73,20 +73,14 @@ These come from the items themselves and are why "add to cart" is not the whole 
 - **Sales tax and shipping** depend on the destination state and on weight; coins and framed items
   need insured shipping.
 
-## Ways to build it, smallest first
+## Buying and sending
 
-| Option | What it is | Effort | Good for | Catch |
-|---|---|---|---|---|
-| **A. Wishlist builder** (no payments) | Static page: pick items, share a link, "print / email this list". Each item links to where to buy it. | Small — stays a static Astro site | Validating demand; gift-givers who buy the parts themselves | No revenue; buyer does the shopping |
-| **B. Request a quote** | Builder + a form that sends the package and contact details to Pieter; payment by invoice | Small–medium: one form endpoint (a Vercel Function or a form service) | Companies, schools, the Capitol-flag service | Manual work per order |
-| **C. Checkout for stocked items** | Builder + hosted checkout (e.g. Stripe Checkout) for items Pieter stocks and ships; others shown as "arranged separately" | Medium: product catalog with prices, a Function to create the checkout, webhook for orders, Vercel Pro | Real e-commerce for the items that can be resold | Inventory, fulfilment, returns, tax |
-| **D. Hosted store** | Shopify (or similar) owns cart, tax, shipping and fulfilment; the site embeds or links its product picker | Medium, mostly configuration | Selling at volume without running a shop backend | Monthly fee; less control over the builder UX |
+The items are sold by other shops, not stocked here, so the stock-holding options first sketched
+for this document (own checkout, own store) are dropped. How a built package gets bought and sent,
+and the goal behind it (as frictionless as possible to send one to a friend or relative), is in
+[shoppable.md](shoppable.md).
 
-**Suggested path:** start with **A** (it reuses everything on the site and costs nothing), add
-**B** for organisations and the Capitol flag, and only then pick **C** or **D** once there is evidence
-people want to buy through the site. Each step keeps the previous one working.
-
-## What option A would add to this repo
+## What the builder page would add to this repo
 
 - `src/content/presets/*.md`: one file per starting package (a title, a short pitch, a list of
   item ids). A schema rejects unknown ids, the same way items are validated today.
@@ -100,13 +94,10 @@ people want to buy through the site. Each step keeps the previous one working.
 
 ## Open questions for Pieter
 
-1. **Is this a business or a gift guide?** Selling (C/D) means stock, shipping, returns, tax and a
-   Pro plan; a guide (A/B) does not.
-2. **Who fulfils?** Pieter packing boxes, a print-on-demand partner for documents, or a dealer
-   drop-shipping coins?
-3. **Which presets** matter most — new citizens, classrooms, collectors, companies?
-4. **Price ceiling.** Is there a target price for a standard package?
-5. **The Capitol flag:** offer it as an arranged extra with a lead time, or link out only?
-6. **Branding of the box and note** — is a custom box part of the idea?
+Buying, fulfilment and fees are asked in [shoppable.md](shoppable.md#open-questions-for-pieter).
 
-Answering 1 and 2 decides most of the rest.
+1. **Which presets** matter most — new citizens, classrooms, collectors, companies?
+2. **Price ceiling.** Is there a target price for a standard package?
+3. **The Capitol flag:** offer it as an arranged extra with a lead time, or link out only?
+4. **Branding of the box and note** — is a custom box part of the idea?
+

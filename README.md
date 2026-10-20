@@ -70,8 +70,9 @@ flowchart LR
     V --> L[CI: ./test.sh --live]
 ```
 
-Details, rollback and configuration: [DEPLOYMENT.md](DEPLOYMENT.md). Ideas for letting people build and
-order their own package: [docs/package-builder.md](docs/package-builder.md). Why it is built this way:
+Details, rollback and configuration: [DEPLOYMENT.md](DEPLOYMENT.md). Ideas for letting people build their
+own package: [docs/package-builder.md](docs/package-builder.md); for buying and sending one through the
+shops that sell each item: [docs/shoppable.md](docs/shoppable.md). Why it is built this way:
 [docs/DECISIONS.md](docs/DECISIONS.md).
 
 ## License

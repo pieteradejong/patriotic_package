@@ -180,3 +180,29 @@ dashed stripe. Rejected:
 **Verified:** `./test.sh` → `bunting hangs across the top of every page` passes on `/` and the 404
 page at 1280, 375 and 320px, and `dist/bunting.svg` is present. Screenshots at 375 and 1280px show
 an unbroken garland above the banner.
+
+## 11. The eagle banner is a short fixed band (supersedes #9's sizing)
+**Date:** 2026-10-20
+**Context:** Pieter: the header banner needs to be less tall. At 1280px it was about 460px, which
+pushed the title below the first screen.
+**Decision:** `.banner-wrap` is `clamp(130px, 20vw, 260px)` tall. The photo is shown whole at that
+height (`object-fit: contain`), centred on its sky colour with 10% faded edges at every width.
+Rejected: cropping the photo shorter. In a 1280×260 frame that cuts the wingtips or the tail, and
+the eagle is the point.
+**Verified:** `./test.sh` → `the eagle banner spans the page directly under the bunting` passes at
+1280, 375 and 320px. It asserts a height between 130 and 265px and `object-fit: contain`, which
+never crops. Screenshots: 130px at 375, 256px at 1280, whole eagle in
+both.
+
+## 12. The site sells nothing itself; items come from other shops
+**Date:** 2026-10-20
+**Context:** Pieter: the items are offered by other shops (the silver coin by APMEX and others).
+The goal is to make sending a package to a friend or relative as frictionless as possible.
+**Decision:** No own stock and no own store. Shoppable means coordinating purchases at the shops
+that sell each item: buy links with offers, then a guided checklist, then a hand-run concierge
+pilot. The approaches and the path are in `docs/shoppable.md`. Rejected: the stock-holding options
+in the first `docs/package-builder.md` draft (own checkout for stocked items, a hosted store
+holding inventory).
+**Verified:** `grep -c '^## ' docs/shoppable.md` → `6` sections, starting with "The goal".
+`docs/package-builder.md` § Buying and sending points to it, and the stock options are removed
+(`grep -c 'Checkout for stocked items' docs/package-builder.md` → `0`).

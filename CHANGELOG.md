@@ -29,6 +29,9 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- The eagle banner is a short fixed band: 130px on phones, up to 260px on desktop, instead of up to
+  about 460px. The whole photo is shown, centred on its sky colour with faded edges, so the eagle
+  is never cropped, and the title now sits near the top of the screen (DECISIONS #11).
 - The thin striped bar at the top of every page is now a row of pleated red, white and navy
   bunting fans with white stars, 96px tall on desktop and 56px on phones. It is a 16 KB SVG drawn
   for the site, not a copied photo (DECISIONS #10).
