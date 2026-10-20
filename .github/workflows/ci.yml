@@ -1,6 +1,6 @@
 # Site checks (docs/DECISIONS.md #2). Two jobs:
 #
-#   tests  — on every push and pull request: ./test.sh in a clean Linux
+#   tests  — on every push and pull request: ./test.sh --offline in a clean Linux
 #            checkout (build, schema, content, meta, contrast, weight,
 #            hygiene, and the Playwright suite at desktop and phone widths).
 #   live   — after Vercel reports a successful production deployment:
@@ -42,7 +42,7 @@ jobs:
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npx playwright install --with-deps chromium
-      - run: ./test.sh
+      - run: ./test.sh --offline
 
   live:
     # Vercel names the GitHub environment `Production` while one project is

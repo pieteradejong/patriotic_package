@@ -30,9 +30,9 @@ build. Prefix a file name with `_` to keep it as a draft.
 ./run.sh                  # dev server on http://localhost:4321/
 ./run.sh build            # production build into dist/
 ./run.sh lint             # shellcheck + astro check
-./test.sh                 # every check (what CI runs): ~100 checks in ~20s
-./test.sh --quick         # static checks only, no build or browser
-./test.sh --network       # also check every outbound link
+./test.sh                 # every check, every link included: ~130 checks in ~30s
+./test.sh --offline       # everything except outbound links (what CI runs per push)
+./test.sh --quick         # static checks and outbound links, no build or browser
 ./test.sh --live https://patriot-package.vercel.app   # check the deployed site
 ```
 
@@ -48,11 +48,12 @@ build. Prefix a file name with `_` to keep it as a draft.
 | Repository hygiene | no `.env`, build output, media or raw JPEG/PNG in git; no file over 1 MB |
 | Type-check | `astro check` |
 | Build and output | `astro build`, every item rendered, 400w/800w `srcset`, lazy photos, width and height on every `img` |
+| Links in the page | every anchor has a target, local paths exist, the 404 page links home, each card links to its item file's URL |
 | Meta, contrast, weight | canonical, Open Graph, `theme-color`, build commit; WCAG AA for every colour pair; 100 KB HTML+CSS+JS budget |
 | Browser | Playwright at 1280, 375 and 320px: items, console errors, horizontal scroll, 404, tap targets, jump nav, badges, photos, links |
-| Network (`--network`) | every product link and `CREDITS.md` source answers; Cloudflare-challenged hosts are skipped with a reason |
+| Outbound links (off with `--offline`) | every link on the built page and every `CREDITS.md` source answers, with one retry. Cloudflare-challenged hosts are skipped with a reason. CI checks them weekly (`links.yml`) |
 
-`scripts/checks.mjs` holds the Dependencies, Config, Content and Network checks.
+`scripts/checks.mjs` holds the Dependencies, Config, Content, page-link and outbound-link checks.
 
 ## How a change ships
 

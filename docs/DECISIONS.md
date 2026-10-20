@@ -122,3 +122,31 @@ as SKIP with a reason, never as PASS. Rejected:
 **Verified:** `./test.sh --quick --network`: 17 links `200`, 3 `SKIP … answers a bot challenge`,
 0 failed. Its first run found four `CREDITS.md` links broken by unencoded parentheses (404), which
 are now fixed.
+
+## 8. `./test.sh` checks every link by default; CI checks them weekly (supersedes #7)
+**Date:** 2026-10-20
+**Context:** Pieter asked for `test.sh` to include the links working. #7 had put the outbound check
+behind `--network`.
+**Decision:**
+- A plain `./test.sh` checks every link. A new "Links in the page" section (offline, after every
+  build) checks that each anchor has its target, each local path is a built file, the 404 page
+  links home, and each card links to exactly the URL in its item file.
+- The outbound check now reads the built page, the URLs visitors actually click, plus every
+  `CREDITS.md` source, with one retry on a network error or 5xx. `--offline` skips only the
+  outbound check.
+- CI per push runs `./test.sh --offline`. A new weekly workflow (`links.yml`, Mondays 13:00 UTC)
+  runs the full `./test.sh`, so a dead product page fails within a week without an outside site's
+  outage failing an unrelated push.
+- Hosts that answer bots with a Cloudflare challenge (usmint.gov ×2, america250.org) stay SKIP with
+  that reason. No script can see past it.
+
+Rejected: the outbound check on every push. It is the same reason as in #7.
+**Verified:**
+- `./test.sh` → `129 passed, 0 failed, 2 warnings, 4 skipped`, including `22 outbound URLs checked
+  (from the built page and CREDITS.md)` and 3 Cloudflare SKIPs.
+- `./test.sh --offline` → `109 passed, 0 failed`, with `SKIP --offline: outbound links not checked`.
+- Deliberate breaks in `dist/index.html` were each caught:
+  - anchor `#h-coins`: `anchors with no target`
+  - a card URL changed to `…federalist-paperz`: `card links differ from the item files`, and
+    `404 https://guides.loc.gov/federalist-paperz`
+- `links.yml` run: NOT YET (first run after push, below).

@@ -1,0 +1,27 @@
+# Weekly full run of ./test.sh, the outbound link check included (docs/DECISIONS.md
+# #8). Per-push CI runs --offline so that another site's outage cannot fail an
+# unrelated push; this job catches a product page or image source that has moved
+# or died. A failure sends GitHub's failed-run email. Run it now:
+#   gh workflow run links.yml && gh run watch
+name: links
+on:
+  schedule:
+    - cron: '0 13 * * 1'   # Mondays 13:00 UTC
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: ./test.sh

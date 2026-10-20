@@ -11,6 +11,7 @@ const groups = (Object.keys(CATEGORIES) as Category[])
 	.map((key) => ({ key, label: CATEGORIES[key], items: items.filter((i) => i.data.category === key) }))
 	.filter((g) => g.items.length > 0);
 const confirmed = items.filter((i) => i.data.status === 'confirmed').length;
+const ideas = items.length - confirmed;
 ---
 <Base
 	title="Patriot Package — an American heritage gift"
@@ -25,7 +26,10 @@ const confirmed = items.filter((i) => i.data.status === 'confirmed').length;
 			</div>
 		</div>
 		<p class="lede">A gift package for America's 250th: founding documents, history, coins and keepsakes.</p>
-		<p class="count">{confirmed} items confirmed · {items.length - confirmed} under consideration</p>
+		<p class="count" data-testid="count">
+			<strong>{confirmed} {confirmed === 1 ? 'item is' : 'items are'} in the package.</strong>
+			{ideas > 0 && <>{' '}{ideas} more {ideas === 1 ? 'is an idea' : 'are ideas'} still being decided, each marked <span class="badge">Idea</span>.</>}
+		</p>
 	</header>
 	<nav class="jump" aria-label="Categories">
 		<ul class="wrap">

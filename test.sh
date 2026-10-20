@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 # Every check this repo has, in one place. Exit 0 = green = safe to commit.
-# CI runs `./test.sh` on every push and PR, and `./test.sh --live <url>` after
-# each production deploy. `./run.sh test` runs this script.
+# CI runs `./test.sh --offline` on every push and PR, the full `./test.sh` weekly
+# (links.yml), and `./test.sh --live <url>` after each production deploy.
+# `./run.sh test` runs this script.
 #
-#   ./test.sh                 all offline checks (the default; --offline is accepted)
-#   ./test.sh --quick         static checks only: no type-check, build or browser
-#   ./test.sh --network       also check that every outbound link answers
+#   ./test.sh                 everything, including that every link works
+#   ./test.sh --offline       skip only the outbound link check (needs the network)
+#   ./test.sh --quick         static checks and outbound links: no type-check, build or browser
 #   ./test.sh --live <url>    only the deployed site at <url>
 #
 # Offline sections: environment, dependencies against the lockfile, the
 # scripts themselves (bash 3.2 syntax, shellcheck, --help), config (exact
 # pins, Node versions, license, vercel.json, workflow SHAs), content (links,
-# images, CREDITS.md), type-check, build, output, meta, WCAG AA contrast,
-# weight, repository hygiene, and Playwright at 1280, 375 and 320px against
-# `astro preview`. Every section runs even after an earlier one fails, except
+# images, CREDITS.md), type-check, build, output, links inside the page
+# (anchors, local paths, each card's link), meta, WCAG AA contrast, weight,
+# repository hygiene, Playwright at 1280, 375 and 320px against `astro preview`,
+# and every outbound link (product pages, image sources) answering. Every section runs even after an earlier one fails, except
 # where it needs the build.
 #
 # A FAIL exits non-zero. A WARN is a known gap that is reported but never
@@ -23,15 +25,15 @@ set -uo pipefail
 cd "$(dirname "$0")" || exit 1
 
 QUICK=0
-NETWORK=0
+NETWORK=1
 LIVE_URL=""
-USAGE="usage: ./test.sh [--offline] [--quick] [--network] [--live <url>] (--help for more)"
+USAGE="usage: ./test.sh [--offline] [--quick] [--live <url>] (--help for more)"
 while [ $# -gt 0 ]; do
 	case "$1" in
-		-h|--help) sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
-		--offline) shift ;;
+		-h|--help) sed -n '2,22p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+		--offline) NETWORK=0; shift ;;
 		--quick)   QUICK=1; shift ;;
-		--network) NETWORK=1; shift ;;
+		--network) NETWORK=1; shift ;;   # the default; kept so older commands still work
 		--live)    [ -n "${2:-}" ] || { echo "$USAGE" >&2; exit 2; }
 		           LIVE_URL="${2%/}"; shift 2 ;;
 		*)         echo "$USAGE" >&2; exit 2 ;;
@@ -277,14 +279,18 @@ else
 	skip "not a git checkout"
 fi
 
-section "Network"
-if [ "$NETWORK" = 1 ]; then
-	checks network
-else
-	skip "outbound links not checked (./test.sh --network)"
-fi
+# network_section [dist]: every outbound link answers; from the built page when given.
+network_section() {
+	section "Outbound links"
+	if [ "$NETWORK" = 1 ]; then
+		report < <(node scripts/checks.mjs network "${1:-}" 2>&1)
+	else
+		skip "--offline: outbound links not checked"
+	fi
+}
 
 if [ "$QUICK" = 1 ]; then
+	network_section
 	section "Type-check, build and browser"
 	skip "--quick: type-check, build, output and browser tests not run"
 	summary
@@ -329,6 +335,9 @@ if [ "$BUILT" = 1 ]; then
 	[ "$lazy" = 0 ] && pass "card photos load lazily" || fail "$lazy card photos are not loading=lazy"
 	nodims=$(grep -o '<img [^>]*>' dist/index.html | grep -v 'width=' | grep -vc 'height=')
 	[ "$nodims" = 0 ] && pass "every img has width and height (no layout shift)" || fail "$nodims img tags lack width/height"
+
+	section "Links in the page"
+	checks links
 
 	section "Meta"
 	for pat in '<html lang="en"' "rel=\"canonical\" href=\"$CANONICAL\"" \
@@ -375,8 +384,10 @@ if [ "$BUILT" = 1 ]; then
 		fail "preview server did not come up on :$PREVIEW_PORT"
 	fi
 else
-	section "Output, meta, contrast, weight, browser"
+	section "Output, links, meta, contrast, weight, browser"
 	skip "the build failed, so nothing built can be checked"
 fi
+
+network_section "$([ "$BUILT" = 1 ] && echo dist)"
 
 summary

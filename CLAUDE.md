@@ -10,9 +10,9 @@ https://patriot-package.vercel.app by Vercel's Git integration. Items are Markdo
 ./init.sh                 # idempotent setup; --clean reinstalls, --test runs ./test.sh after
 ./run.sh                  # dev server :4321   (./run.sh stop ends dev/preview daemons)
 ./run.sh lint             # shellcheck + astro check
-./test.sh                 # everything CI runs; starts `astro preview` on :4322
-./test.sh --quick         # static checks only
-./test.sh --network       # outbound links (not in CI)
+./test.sh                 # everything, outbound links included; starts `astro preview` on :4322
+./test.sh --offline       # what CI runs per push (no outbound links)
+./test.sh --quick         # static checks + outbound links, no build
 ./test.sh --live <url>    # deployed site
 ```
 

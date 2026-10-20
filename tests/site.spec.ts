@@ -94,3 +94,12 @@ test('every item links out over https', async ({ page }) => {
 		await expect(page.locator(`[data-item="${id}"] a.more`)).toHaveAttribute('href', /^https:\/\//);
 	}
 });
+
+test('the header counts match the cards and explain the Idea badge', async ({ page }) => {
+	await page.goto('/');
+	const inPackage = await page.locator('[data-status="confirmed"]').count();
+	const ideas = await page.locator('[data-status="speculative"]').count();
+	const count = page.getByTestId('count');
+	await expect(count).toContainText(`${inPackage} items are in the package.`);
+	await expect(count).toContainText(`${ideas} more are ideas still being decided, each marked Idea.`);
+});

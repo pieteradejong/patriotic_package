@@ -4,7 +4,8 @@
 //   node scripts/checks.mjs deps      package.json, lockfile and node_modules agree
 //   node scripts/checks.mjs config    pins, Node versions, license, vercel.json, workflow SHAs
 //   node scripts/checks.mjs content   items, links, images, CREDITS.md
-//   node scripts/checks.mjs network   every outbound link answers (needs the network)
+//   node scripts/checks.mjs links     links inside the built page (needs dist/)
+//   node scripts/checks.mjs network [dist]  every outbound link answers (needs the network)
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -144,22 +145,65 @@ async function content() {
 		: pass(`all ${licenses.length} credited images are public domain, CC0 or no restrictions`);
 }
 
-// A host answering a bot challenge (Cloudflare 403 + cf-mitigated) cannot be judged from here.
-async function network() {
-	const urls = new Map();
-	for (const i of items()) if (i.url) urls.set(i.url, i.id);
-	for (const [, u] of read('CREDITS.md').matchAll(/\]\((https:[^)]+)\)/g)) urls.set(u, 'CREDITS.md');
-	await Promise.all([...urls].map(async ([u, from]) => {
-		try {
-			const r = await fetch(u, { redirect: 'follow', signal: AbortSignal.timeout(20000), headers: { 'user-agent': 'Mozilla/5.0 patriot-package-linkcheck' } });
-			if (r.ok) pass(`${r.status} ${u}`);
-			else if (r.status === 403 && (r.headers.get('cf-mitigated') || r.headers.get('server') === 'cloudflare')) skip(`${u} (${from}) answers a bot challenge; check it in a browser`);
-			else fail(`${r.status} ${u} (${from})`);
-		} catch (e) { fail(`${u} (${from}): ${e.cause?.code ?? e.message}`); }
-	}));
+// Links inside the built page: every #anchor has its target, every local path is
+// a file in dist/, and each card links to exactly the URL its item file names.
+function links() {
+	if (!existsSync('dist/index.html')) return fail('dist/index.html missing (build first)');
+	const html = read('dist/index.html');
+	const hrefs = [...html.matchAll(/<a\b[^>]*\bhref="([^"]*)"/g)].map((m) => m[1].replace(/&amp;/g, '&'));
+	const ids = new Set([...html.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]));
+	const anchors = hrefs.filter((h) => h.startsWith('#'));
+	const brokenAnchors = anchors.filter((h) => !ids.has(h.slice(1)));
+	brokenAnchors.length ? fail(`anchors with no target: ${brokenAnchors.join(', ')}`) : pass(`all ${anchors.length} in-page anchors have a target`);
+	const html404 = existsSync('dist/404.html') ? read('dist/404.html') : '';
+	const local = [...hrefs, ...[...html404.matchAll(/<a\b[^>]*\bhref="([^"]*)"/g)].map((m) => m[1])].filter((h) => h.startsWith('/'));
+	const missing = local.filter((h) => {
+		const path = join('dist', h.split(/[?#]/)[0]);
+		return !(existsSync(path) && statSync(path).isFile()) && !existsSync(join(path, 'index.html'));
+	});
+	missing.length ? fail(`local links to missing files: ${missing.join(', ')}`) : pass(`all ${local.length} local links point to a built file`);
+	const notFound = html404.match(/<a\b[^>]*\bhref="([^"]*)"[^>]*>Back to the package/);
+	notFound?.[1] === '/' ? pass('404 page links back to /') : fail('404 page has no "Back to the package" link to /');
+	const odd = hrefs.filter((h) => !/^(#|\/|https:\/\/)/.test(h));
+	odd.length ? fail(`links that are not https, local or an anchor: ${odd.join(', ')}`) : pass('every link is https, local or an anchor');
+	const wrong = [];
+	for (const i of items()) {
+		const card = html.match(new RegExp(`data-item="${i.id}"[\\s\\S]*?</li>`))?.[0] ?? '';
+		const got = [...card.matchAll(/<a\b[^>]*class="more"[^>]*href="([^"]*)"|<a\b[^>]*href="([^"]*)"[^>]*class="more"/g)].map((m) => (m[1] ?? m[2]).replace(/&amp;/g, '&'));
+		if (got.length !== 1 || got[0] !== i.url) wrong.push(`${i.id}: page has ${got.join(' ') || 'no link'}, item file says ${i.url}`);
+	}
+	wrong.length ? fail(`card links differ from the item files: ${wrong.join('; ')}`) : pass('every card links to the URL in its item file');
 }
 
-const sections = { deps, config, content, network };
+// Every outbound URL answers. From the built page when there is one (what visitors
+// click), else from the item files; plus every source page in CREDITS.md. One retry
+// on a network error or 5xx. A host answering a bot challenge (403 from Cloudflare)
+// cannot be judged from a script and is skipped with that reason, never passed.
+async function network() {
+	const urls = new Map();
+	const fromDist = process.argv[3] === 'dist' && existsSync('dist/index.html');
+	if (fromDist) {
+		for (const [, u] of read('dist/index.html').matchAll(/<a\b[^>]*\bhref="(https:[^"]+)"/g)) urls.set(u.replace(/&amp;/g, '&'), 'page');
+	} else {
+		for (const i of items()) if (i.url) urls.set(i.url, i.id);
+	}
+	for (const [, u] of read('CREDITS.md').matchAll(/\]\((https:[^)]+)\)/g)) urls.set(u, 'CREDITS.md');
+	const get = (u) => fetch(u, { redirect: 'follow', signal: AbortSignal.timeout(20000), headers: { 'user-agent': 'Mozilla/5.0 patriot-package-linkcheck' } });
+	await Promise.all([...urls].map(async ([u, from]) => {
+		let r;
+		for (let attempt = 1; attempt <= 2; attempt++) {
+			try { r = await get(u); if (r.status < 500) break; } catch (e) { r = e; }
+			await new Promise((ok) => setTimeout(ok, 2000));
+		}
+		if (r instanceof Error) fail(`${u} (${from}): ${r.cause?.code ?? r.message}`);
+		else if (r.ok) pass(`${r.status} ${u}`);
+		else if (r.status === 403 && (r.headers.get('cf-mitigated') || r.headers.get('server') === 'cloudflare')) skip(`${u} (${from}) answers a bot challenge; check it in a browser`);
+		else fail(`${r.status} ${u} (${from})`);
+	}));
+	pass(`${urls.size} outbound URLs checked (${fromDist ? 'from the built page' : 'from the item files'} and CREDITS.md)`);
+}
+
+const sections = { deps, config, content, links, network };
 const which = process.argv[2];
 if (!sections[which]) { console.error(`usage: node scripts/checks.mjs ${Object.keys(sections).join('|')}`); process.exit(2); }
 try { await sections[which](); } catch (e) { fail(`${which} check crashed: ${e.message}`); }

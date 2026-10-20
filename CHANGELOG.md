@@ -29,11 +29,18 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- The header no longer says "4 items confirmed · 6 under consideration". It now reads "4 items are
+  in the package. 6 more are ideas still being decided, each marked [Idea]." A browser test keeps
+  both numbers in step with the cards.
+- `./test.sh` checks every link by default. A new "Links in the page" section checks anchors, local
+  paths, the 404 link home, and each card's URL against its item file. Outbound links are now read
+  from the built page and retried once; `--offline` skips them. CI per push runs `--offline`, and
+  the new weekly `links.yml` runs everything (DECISIONS #8).
 - `./test.sh` now covers dependencies against the lockfile, the scripts themselves (bash 3.2,
   shellcheck, `--help`), config (pins, Node versions, license, `vercel.json`, Action SHAs), content
   and image rules against `CREDITS.md`, `astro check`, image output (`srcset`, lazy loading,
   dimensions) and media hygiene. Every section runs even after an earlier one fails, and the
-  summary names the sections that failed. New flags: `--quick` and `--network` (DECISIONS #7).
+  summary names the sections that failed. New flag: `--quick` (DECISIONS #7, superseded by #8).
 - `./init.sh` is idempotent. It reuses `node_modules` while it matches the lockfile, installs the
   Playwright browser when there is no Chrome, generates Astro's types and checks for shellcheck.
   New flags: `--clean` and `--test`. `./run.sh` gains `lint` and `type-check`.
