@@ -29,6 +29,9 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- The thin striped bar at the top of every page is now a row of pleated red, white and navy
+  bunting fans with white stars, 96px tall on desktop and 56px on phones. It is a 16 KB SVG drawn
+  for the site, not a copied photo (DECISIONS #10).
 - A full-width photo of a bald eagle in flight now runs across the top of the page, replacing the
   small round eagle portrait beside the title. Its shape is fixed up to 1280px. Wider screens get
   the photo's sky colour either side, with feathered edges; phones keep at least 150px of height.

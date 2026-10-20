@@ -104,12 +104,27 @@ test('the header counts match the cards and explain the Idea badge', async ({ pa
 	await expect(count).toContainText(`${ideas} more are ideas still being decided, each marked Idea.`);
 });
 
-test('the eagle banner spans the top of the page', async ({ page }) => {
+test('the eagle banner spans the page directly under the bunting', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.locator('img.banner')).toBeVisible();
 	const banner = (await page.locator('.banner-wrap').boundingBox())!;
 	const width = page.viewportSize()!.width;
 	expect(banner.width).toBeGreaterThanOrEqual(width - 1);
-	expect(banner.y).toBeLessThan(20);
+	// Directly under the bunting, nothing in between.
+	const bunting = (await page.locator('.bunting').boundingBox())!;
+	expect(Math.abs(banner.y - (bunting.y + bunting.height))).toBeLessThanOrEqual(1);
 	expect(banner.height).toBeGreaterThanOrEqual(150);
+});
+
+test('bunting hangs across the top of every page', async ({ page, request }) => {
+	expect((await request.get('/bunting.svg')).status()).toBe(200);
+	for (const path of ['/', '/this-page-does-not-exist']) {
+		await page.goto(path);
+		const bunting = page.locator('.bunting');
+		await expect(bunting).toHaveCSS('background-image', /bunting\.svg/);
+		const box = (await bunting.boundingBox())!;
+		expect(box.y).toBe(0);
+		expect(box.width).toBeGreaterThanOrEqual(page.viewportSize()!.width - 1);
+		expect(box.height).toBeGreaterThanOrEqual(50);
+	}
 });

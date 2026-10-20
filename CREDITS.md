@@ -18,5 +18,8 @@ The source page has the full provenance.
 | `src/assets/items/mint-coin-set.webp` | Public domain | United States Mint | [Commons](https://commons.wikimedia.org/wiki/File:2019_US_Mint_silver_proof_set.jpg) |
 | `src/assets/items/silver-coin.webp` | Public domain | United States Mint | [Commons](https://commons.wikimedia.org/wiki/File:American_Silver_Eagle,_obverse,_2022.jpg) |
 
+`public/bunting.svg`, the row of pleated fans across the top, was drawn for this site (generated
+SVG, no source image) and is CC0 like the rest of the repo.
+
 The banner is a bald eagle in flight, photographed for the U.S. Fish and Wildlife Service. The Great Seal of the
 United States was deliberately not used: 18 U.S.C. § 713 restricts its display.

@@ -166,3 +166,17 @@ two eagles at the top would compete. Rejected:
 **Verified:** `./test.sh` → `132 passed, 0 failed`, including `the eagle banner spans the top of
 the page` at 1280, 375 and 320px and `src/assets/eagle-banner.webp (17 KB)`. Screenshots at 375,
 1280 and 1920px show the whole eagle, wingtips to tail, with no seam at 1920.
+
+## 10. Header bunting is a drawn SVG, not the reference photo
+**Date:** 2026-10-20
+**Context:** Pieter shared a photo of pleated half-fan bunting and asked for a ribbon like it in
+the header. The photo looks like a retailer's product shot, and its license is unknown.
+**Decision:** `public/bunting.svg`, drawn for the site. Bands run red, cream, navy with 13 white
+stars, cream, then a red centre. Each of 16 pleats is shaded light and dark, and the hem is gently
+scalloped. A CSS `repeat-x` hangs a row of fans across the top of every page, replacing the
+dashed stripe. Rejected:
+- Using the reference photo: unknown license, and a raster file that would blur when scaled.
+- A single large fan: it competes with the eagle banner directly below.
+**Verified:** `./test.sh` → `bunting hangs across the top of every page` passes on `/` and the 404
+page at 1280, 375 and 320px, and `dist/bunting.svg` is present. Screenshots at 375 and 1280px show
+an unbroken garland above the banner.
