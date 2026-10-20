@@ -1,0 +1,50 @@
+---
+// The package list: every item from src/content/items, grouped by category.
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { CATEGORIES, type Category } from '../consts';
+
+const items = (await getCollection('items')).sort((a, b) => a.data.order - b.data.order);
+const groups = (Object.keys(CATEGORIES) as Category[])
+	.map((key) => ({ key, label: CATEGORIES[key], items: items.filter((i) => i.data.category === key) }))
+	.filter((g) => g.items.length > 0);
+const confirmed = items.filter((i) => i.data.status === 'confirmed').length;
+---
+<Base
+	title="Patriot Package — an American heritage gift"
+	description="A gift package for America's 250th: founding documents, history, coins and keepsakes."
+>
+	<header class="hero wrap">
+		<p class="eyebrow">1776 – 2026</p>
+		<h1>Patriot Package</h1>
+		<p class="lede">A gift package for America's 250th: founding documents, history, coins and keepsakes.</p>
+		<p class="count">{confirmed} items confirmed · {items.length - confirmed} under consideration</p>
+	</header>
+	<main class="wrap">
+		{groups.map((g) => (
+			<section aria-labelledby={`h-${g.key}`}>
+				<h2 id={`h-${g.key}`}>{g.label}</h2>
+				<ul class="items">
+					{g.items.map(async (item) => {
+						const { Content } = await render(item);
+						return (
+							<li class="item" data-item={item.id} data-status={item.data.status}>
+								<div class="item-head">
+									<h3>{item.data.title}</h3>
+									{item.data.status === 'speculative' && <span class="badge">Idea</span>}
+								</div>
+								<div class="item-body"><Content /></div>
+								{(item.data.priceUsd || item.data.buyUrl) && (
+									<p class="meta">
+										{item.data.priceUsd && <span>${item.data.priceUsd}</span>}
+										{item.data.buyUrl && <a href={item.data.buyUrl} rel="noopener">Where to buy</a>}
+									</p>
+								)}
+							</li>
+						);
+					})}
+				</ul>
+			</section>
+		))}
+	</main>
+</Base>

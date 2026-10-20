@@ -1,0 +1,24 @@
+{
+  "name": "patriot-package",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "license": "CC0-1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
+    "@vercel/analytics": "2.0.1",
+    "astro": "7.3.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}

@@ -1,0 +1,85 @@
+# Site checks (docs/DECISIONS.md #2). Two jobs:
+#
+#   tests  — on every push and pull request: ./test.sh in a clean Linux
+#            checkout (build, schema, content, meta, contrast, weight,
+#            hygiene, and the Playwright suite at desktop and phone widths).
+#   live   — after Vercel reports a successful production deployment:
+#            ./test.sh --live against https://patriot-package.vercel.app,
+#            including that the live build is the commit that was deployed.
+#            It can also be run by hand against any URL.
+#
+# Vercel builds and deploys on its own (Git integration); it does not run
+# test.sh. This workflow is what makes "the site works" a status on GitHub.
+name: site
+on:
+  push:
+    branches: [main]
+  pull_request:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: 'Deployed site to check (live job only)'
+        required: false
+        default: 'https://patriot-package.vercel.app'
+permissions:
+  contents: read
+concurrency:
+  group: site-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  tests:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: ./test.sh
+
+  live:
+    # Vercel names the GitHub environment `Production` while one project is
+    # linked to the repo and `Production – <project>` when several are.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'deployment_status' &&
+       github.event.deployment_status.state == 'success' &&
+       (github.event.deployment.environment == 'Production' ||
+        github.event.deployment.environment == 'Production – patriot-package'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SITE_URL: ${{ github.event_name == 'workflow_dispatch' && inputs.url || 'https://patriot-package.vercel.app' }}
+      DEPLOY_URL: ${{ github.event.deployment_status.environment_url }}
+      # The commit the live page must be built from. Empty on a manual run,
+      # where test.sh compares with origin/main instead.
+      EXPECTED_COMMIT: ${{ github.event.deployment.sha }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Test the commit that was deployed, not whatever main is now.
+          ref: ${{ github.event.deployment.sha || github.sha }}
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - name: Wait for the production alias to serve the deployed commit
+        run: |
+          for i in $(seq 1 18); do
+            sha=$(curl -s -L --max-time 15 "$SITE_URL/" | grep -o 'name="build-commit" content="[0-9a-f]*"' | grep -o '[0-9a-f]\{40\}' || true)
+            echo "attempt $i: $SITE_URL serves ${sha:-nothing}"
+            [ -z "$EXPECTED_COMMIT" ] && [ -n "$sha" ] && break
+            [ -n "$EXPECTED_COMMIT" ] && [ "$sha" = "$EXPECTED_COMMIT" ] && break
+            sleep 10
+          done
+      - run: ./test.sh --live "$SITE_URL"

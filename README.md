@@ -1,17 +1,53 @@
-# patriotic_package
+# Patriot Package
 
-## Contents
+A gift package for America's 250th (1776–2026): founding documents, history, coins and keepsakes.
 
-### Declaration of Independence
+**Live:** https://patriot-package.vercel.app
 
-### Constitution
+## The list
 
-### 250 Years of American History (Book)
+Each item is one Markdown file in [`src/content/items/`](src/content/items/). The page groups items by
+category, and anything still undecided gets an "Idea" badge.
 
-- 1 ounce silver coin
-- (speculative) U.S. flag flown over the Capitol
-- (speculative) Replica of the Liberty Bell
-- (speculative) Coin/currency set from the U.S. Mint (e.g., American Eagle series)
-- (speculative) The Federalist Papers
-- (speculative) Naturalization/founding-era timeline print
-- (speculative) Framed copy of a historical newspaper front page (e.g., Declaration's first printing)
+| Field | Required | Values |
+|---|---|---|
+| `title` | yes | text |
+| `category` | yes | `document`, `book`, `coin`, `keepsake` (headings in `src/consts.ts`) |
+| `status` | yes | `confirmed` (in the package) or `speculative` (an idea) |
+| `order` | yes | integer, sort order on the page |
+| `source`, `buyUrl`, `priceUsd` | no | where it comes from, a link to buy it, a price in dollars |
+
+The body below the frontmatter is the item's description. A file that breaks the schema fails the
+build. Prefix a file name with `_` to keep it as a draft.
+
+## Commands
+
+```bash
+./init.sh                 # check Node ≥22.12, npm ci
+./run.sh                  # dev server on http://localhost:4321/
+./run.sh build            # production build into dist/
+./test.sh                 # build + every check + browser tests (what CI runs)
+./test.sh --live https://patriot-package.vercel.app   # check the deployed site
+```
+
+## How a change ships
+
+```mermaid
+flowchart LR
+    E[Edit an item] --> B{Branch or main?}
+    B -- branch / PR --> P[Vercel preview URL on the PR]
+    B -- branch / PR --> T1[CI: ./test.sh]
+    P & T1 --> M[Merge to main]
+    B -- main --> M
+    M --> V[Vercel production deploy]
+    M --> T2[CI: ./test.sh]
+    M --> S[CI: security]
+    V --> L[CI: ./test.sh --live]
+```
+
+Details, rollback and configuration: [DEPLOYMENT.md](DEPLOYMENT.md). Why it is built this way:
+[docs/DECISIONS.md](docs/DECISIONS.md).
+
+## License
+
+[CC0 1.0](LICENSE): public domain, code included.
