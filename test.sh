@@ -89,6 +89,7 @@ run_browser_tests() {
 		if (r.errors?.length) console.log('ERR\t' + r.errors[0].message.split('\n')[0]);
 		const walk = (s) => {
 			for (const sp of s.specs ?? []) for (const t of sp.tests) {
+				if (t.status === 'skipped') { console.log('SKIP\t[' + t.projectName + '] ' + sp.title); continue; }
 				const res = t.results.at(-1) ?? {};
 				const ok = t.status === 'expected';
 				const why = ok ? '' : (res.errors ?? [res.error]).filter(Boolean).map(e => (e.message ?? '').replace(/\x1b\[[0-9;]*m/g, '').split('\n').find(l => l.trim())).join(' | ');
@@ -107,6 +108,7 @@ run_browser_tests() {
 		[ -z "$verdict" ] && continue
 		case "$verdict" in
 			PASS) pass "$msg" ;;
+			SKIP) skip "$msg" ;;
 			*)    fail "$msg" ;;
 		esac
 	done <<< "$results"
@@ -215,7 +217,7 @@ done
 section "Meta"
 for pat in '<html lang="en"' 'rel="canonical" href="https://patriot-package.vercel.app/"' \
 	'<meta name="description"' 'property="og:title"' 'property="og:description"' \
-	'name="viewport"' '<meta name="build-commit" content="[0-9a-f]\{40\}"' '<vercel-analytics'; do
+	'name="viewport"' 'name="theme-color"' '<meta name="build-commit" content="[0-9a-f]\{40\}"' '<vercel-analytics'; do
 	grep -q "$pat" dist/index.html && pass "index.html has $pat" || fail "index.html lacks $pat"
 done
 

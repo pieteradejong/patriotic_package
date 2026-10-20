@@ -28,5 +28,7 @@ export default defineConfig({
 	projects: [
 		{ name: 'desktop', use: { viewport: { width: 1280, height: 800 } } },
 		{ name: 'mobile', use: { viewport: { width: 375, height: 740 }, isMobile: true, hasTouch: true } },
+		// The narrowest phones in use (iPhone SE 1st gen); where wrapping breaks first.
+		{ name: 'small', use: { viewport: { width: 320, height: 640 }, isMobile: true, hasTouch: true } },
 	],
 });

@@ -67,3 +67,43 @@ the checks run on them afterwards. Rejected:
 - Requiring `live`: it runs after the deploy, so it cannot gate one.
 **Verified:** `gh api repos/pieteradejong/patriotic_package/branches/main/protection` →
 `{"admins":false,"checks":["tests","security / gitleaks","security / gate"],"force":false}`.
+
+## 5. Category navigation is a sticky row of chips
+**Date:** 2026-10-20
+**Context:** On a 375px phone the page is about 5,000px tall, with 10 cards in 4 sections.
+**Decision:** A `<nav>` of category chips under the header, built from the same groups as the
+page. On phones it sticks to the top and scrolls sideways inside itself. From 481px it is a plain
+row. Section headings carry `scroll-margin-top`, so a jump lands below the bar. Rejected:
+- A hamburger menu: it hides four links behind a tap.
+- Collapsible `<details>` sections: they hide the list, which is the page.
+**Verified:** `./test.sh` → `59 passed, 0 failed, 0 warnings, 1 skipped`, including:
+- `jump nav has one link per section and lands below the sticky bar` at 1280, 375 and 320px
+- `jump nav stays at the top on phones` at 375 and 320px (skipped on desktop by design)
+- `no horizontal scroll` at all three widths
+
+## 6. Real public-domain photos, committed and small
+**Date:** 2026-10-20
+**Context:** Pieter asked for product pictures and chose real photos over drawn SVG or hotlinked
+images. The workspace rule is "no media or large binaries in git".
+**Decision:** Ten images from Wikimedia Commons, all public domain, CC0 or "No restrictions". They
+are cropped to 800×600 (the eagle 320×320), WebP, 11–108 KB each, about 0.6 MB in total, and
+committed in `src/assets/`. Astro builds 400px and 800px variants. Small optimized stills fit the
+rule's intent, which targets video, audio, weights and datasets. Sources and licenses are in
+`CREDITS.md`. Rejected:
+- CC BY / BY-SA photos: they would add attribution and share-alike terms to a CC0 repo.
+- Hotlinking Commons: a third-party dependency, visitors' requests going to Wikimedia, and links
+  that can break.
+- The Great Seal for the header eagle: its display is restricted (18 U.S.C. § 713). A USFWS bald
+  eagle photo is used instead.
+- An image for "250 Years of American History": it is not yet a specific book, so there is no
+  cover to show.
+Product links point to official pages only. usmint.gov and america250.org answer automated
+requests with a Cloudflare challenge (403), so those two paths come from search-indexed results.
+They are not fetched by CI.
+**Verified:**
+- `du -ch src/assets/eagle.webp src/assets/items/*.webp | tail -1` → `584K total`.
+- Commons API `LicenseShortName` for all ten: `Public domain` ×9, `No restrictions` ×1 (CREDITS.md).
+- `curl -L -w '%{http_code}'` → `200` for archives.gov ×2, guides.loc.gov, nps.gov, aoc.gov ×2 and
+  en.wikipedia.org.
+- `./test.sh`: `photos load, have alt text and fit their card` and `every item links out over https`
+  pass at all three widths.

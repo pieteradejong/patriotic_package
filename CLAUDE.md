@@ -24,5 +24,9 @@ https://patriot-package.vercel.app by Vercel's Git integration. Items are Markdo
   `npx astro preview stop` / `npx astro dev stop`.
 - Off Vercel, `/_vercel/insights/script.js` returns 404. The Playwright console-error test ignores
   that URL only.
+- Item photos: public domain or CC0 only, 800×600 WebP, and a row in `CREDITS.md` for each
+  (`docs/DECISIONS.md` #6). The schema refuses `image` without `imageAlt`.
+- usmint.gov and america250.org return 403 (a Cloudflare challenge) to `curl` and headless
+  Chromium. Check those links in a real browser.
 - Item categories are listed in `src/consts.ts`. Add a key there, or the schema rejects the
   file.
