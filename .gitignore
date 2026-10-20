@@ -17,3 +17,11 @@ Thumbs.db
 logs/
 tmp/
 *.tmp
+
+# --- node / astro / vercel ---
+node_modules/
+dist/
+.astro/
+.vercel/
+test-results/
+playwright-report/
