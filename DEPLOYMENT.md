@@ -39,6 +39,9 @@ push to `main`.
 
 ## Configuration
 
+- **Build settings live in `vercel.json`** (framework `astro`, `npm run build`, output `dist`), not in
+  the dashboard. The project was created by the CLI with preset "Other" and output `public`, which
+  would have deployed the wrong directory.
 - **Output:** fully static. Add the `@astrojs/vercel` adapter only when a page needs server
   rendering.
 - **Environment variables:** none.
