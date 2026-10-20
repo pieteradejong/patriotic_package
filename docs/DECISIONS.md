@@ -149,4 +149,4 @@ Rejected: the outbound check on every push. It is the same reason as in #7.
   - anchor `#h-coins`: `anchors with no target`
   - a card URL changed to `…federalist-paperz`: `card links differ from the item files`, and
     `404 https://guides.loc.gov/federalist-paperz`
-- `links.yml` run: NOT YET (first run after push, below).
+- `links.yml` run 39468086901 (workflow_dispatch on `a25afd6`) → success, `130 passed, 0 failed, 1 warnings, 4 skipped`. Per-push `site`, `security` and post-deploy `live` → success.
