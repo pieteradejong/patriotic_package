@@ -7,3 +7,4 @@
 - [x] Add a weekly scheduled `./test.sh --network` job (like astropieter's link report) once the item list settles, 2026-10-20 — docs/DECISIONS.md #7
 - [ ] Open the three Cloudflare-blocked links in a browser and confirm each page is right (usmint.gov American Eagle coins, usmint.gov proof sets, america250.org About; proudpatriots.com too if it starts answering 429), 2026-10-20 — docs/DECISIONS.md #8
 - [ ] Answer the open questions in docs/shoppable.md (affiliate links, concierge fee, shops per item, claim link, delivery promise) and docs/package-builder.md (presets, price ceiling, Capitol flag, box), then pick the first step, 2026-10-20 — docs/shoppable.md § Suggested path
+- [ ] Move the untracked `AUDIT_2026-09-01.md` out of the repo to `~/dev/audit-reports/` (audit output never goes in a git repo, so it was left out of the 2026-10-21 push), 2026-10-21 — ~/dev/CLAUDE.md § Hard rules
