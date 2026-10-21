@@ -23,3 +23,13 @@ SVG, no source image) and is CC0 like the rest of the repo.
 
 The banner is a bald eagle in flight, photographed for the U.S. Fish and Wildlife Service. The Great Seal of the
 United States was deliberately not used: 18 U.S.C. § 713 restricts its display.
+
+## Shown from the seller's site, not in this repo
+
+One product photo is loaded from the seller's own site when the page opens. It is not copied into
+this repo, so the repo's CC0 does not cover it: the seller's copyright applies (`docs/DECISIONS.md`
+#13). Hosts allowed for this are listed in `HOTLINK_HOSTS` in `src/consts.ts`.
+
+| Item | Rights | Holder | Image |
+|---|---|---|---|
+| 250 Years of American History | All rights reserved | Proud Patriots | [illustration from the military chapter](https://proudpatriots.com/cdn/shop/files/Screenshot_2026-03-31_at_14.06.13.png?v=1774980491) |

@@ -91,7 +91,9 @@ test('photos load, have alt text and fit their card', async ({ page }) => {
 test('every item links out over https', async ({ page }) => {
 	await page.goto('/');
 	for (const id of ITEM_IDS) {
-		await expect(page.locator(`[data-item="${id}"] a.more`)).toHaveAttribute('href', /^https:\/\//);
+		const links = page.locator(`[data-item="${id}"] a.more`);
+		expect(await links.count()).toBeGreaterThan(0);
+		for (const a of await links.all()) await expect(a).toHaveAttribute('href', /^https:\/\//);
 	}
 });
 

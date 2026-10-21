@@ -206,3 +206,41 @@ holding inventory).
 **Verified:** `grep -c '^## ' docs/shoppable.md` → `6` sections, starting with "The goal".
 `docs/package-builder.md` § Buying and sending points to it, and the stock options are removed
 (`grep -c 'Checkout for stocked items' docs/package-builder.md` → `0`).
+
+## 13. The book shows the seller's photo, loaded from their site (supersedes #6 for this item)
+**Date:** 2026-10-21
+**Context:** The book is now a specific one: Andrew Prescott's "250 Years of American History", sold
+by Proud Patriots. It has no public-domain cover or interior image. Pieter chose to override #6 for
+it.
+**Decision:** The card shows one interior illustration from the seller's product page, loaded from
+their Shopify CDN with a plain `<img>` (`srcset` at `&width=400` and `&width=800`, lazy,
+`referrerpolicy="no-referrer"`). It is not committed and not passed through Astro's `<Image>`, which
+would download it at build time and serve a copy from this site. A new `imageUrl` field holds it,
+and the schema allows it only on hosts in `HOTLINK_HOSTS` (`src/consts.ts`). It is credited in
+`CREDITS.md` under its own section, as all rights reserved. Every other photo stays under #6. Only
+the seller's public product facts are published. The purchase record that came with the details
+stays out of the repo and off the site. Rejected:
+- Committing a copy: it would put a copyrighted image inside a public CC0 repo.
+- No image: Pieter wanted the book shown.
+Costs accepted: visitors' browsers request the image from the seller's CDN, and the photo breaks if
+the seller renames or removes it. The weekly link check fetches the image URL from `CREDITS.md`, so
+a dead image fails within a week.
+**Verified:**
+- `./test.sh` → `140 passed, 0 failed, 1 warnings, 4 skipped`, including `photos load, have alt
+  text and fit their card` at all three widths, `american-history-book: hotlinked photo is
+  credited`, and `200` for the image URL.
+- `curl` of the image with `Accept: image/webp` → WebP, 800×598.
+
+## 14. A card may carry a second link, to background on the item
+**Date:** 2026-10-21
+**Context:** The book needs both a buy link (Proud Patriots, per #12) and the america250.org
+background page it already had. Cards had exactly one link.
+**Decision:** A new optional `about` field (`url`, `label`, the same shape as `link`) renders a
+second `a.more` after the buy link. The link check in `scripts/checks.mjs` now expects a card's
+links to equal `[link, about]` in that order. The outbound check treats a Cloudflare `429` like the
+existing `403`, as a SKIP: proudpatriots.com answered `curl` with `429` and `server: cloudflare`
+once. Rejected: putting the second link in the Markdown body, which the link check doesn't see.
+**Verified:**
+- `./test.sh --offline` → `118 passed, 0 failed`.
+- Changing the about URL in `dist/index.html` → `FAIL card links differ from the item files:
+  american-history-book: …`. Restored → `PASS every card links to the URLs in its item file`.

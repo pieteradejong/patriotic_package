@@ -24,7 +24,7 @@ const BANNER = 'src/assets/eagle-banner.webp';
 const BANNER_SIZE = [2000, 720];
 const HOLDER = 'Pieter de Jong';
 
-// Minimal frontmatter reader: the item files use flat keys plus one nested `link`.
+// Minimal frontmatter reader: the item files use flat keys plus nested `link` and `about`.
 function items() {
 	return readdirSync(ITEMS_DIR)
 		.filter((f) => f.endsWith('.md') && !f.startsWith('_'))
@@ -35,9 +35,11 @@ function items() {
 			return {
 				id: f.replace(/\.md$/, ''),
 				image: get(/^image:\s*(.+)$/m),
+				imageUrl: get(/^imageUrl:\s*(.+)$/m),
 				imageAlt: get(/^imageAlt:\s*(.+)$/m),
-				url: get(/^\s+url:\s*(.+)$/m),
-				label: get(/^\s+label:\s*(.+)$/m),
+				url: get(/^link:\n\s+url:\s*(.+)$/m),
+				label: get(/^link:\n\s+url:.*\n\s+label:\s*(.+)$/m),
+				aboutUrl: get(/^about:\n\s+url:\s*(.+)$/m),
 			};
 		});
 }
@@ -108,11 +110,16 @@ async function content() {
 
 	const noLink = list.filter((i) => !i.url).map((i) => i.id);
 	noLink.length ? fail(`items without a link: ${noLink.join(', ')}`) : pass(`all ${list.length} items have a link`);
-	const insecure = list.filter((i) => i.url && !i.url.startsWith('https://')).map((i) => i.id);
+	const insecure = list.filter((i) => [i.url, i.aboutUrl].some((u) => u && !u.startsWith('https://'))).map((i) => i.id);
 	insecure.length ? fail(`links not on https: ${insecure.join(', ')}`) : pass('every link is https');
 
-	const noImage = list.filter((i) => !i.image).map((i) => i.id);
+	const noImage = list.filter((i) => !i.image && !i.imageUrl).map((i) => i.id);
 	noImage.length ? warn(`items without a photo: ${noImage.join(', ')}`) : pass('every item has a photo');
+	// A hotlinked seller photo is not in the repo, but CREDITS.md still says whose it is.
+	// The schema limits its host (HOTLINK_HOSTS in src/consts.ts).
+	for (const i of list.filter((i) => i.imageUrl)) {
+		credits.includes(`(${i.imageUrl})`) ? pass(`${i.id}: hotlinked photo is credited`) : fail(`${i.id}: hotlinked photo has no row in CREDITS.md`);
+	}
 
 	let sharp;
 	try { sharp = (await import('sharp')).default; } catch { skip('sharp not installed; image dimensions not checked'); }
@@ -147,7 +154,7 @@ async function content() {
 }
 
 // Links inside the built page: every #anchor has its target, every local path is
-// a file in dist/, and each card links to exactly the URL its item file names.
+// a file in dist/, and each card links to exactly the URLs its item file names.
 function links() {
 	if (!existsSync('dist/index.html')) return fail('dist/index.html missing (build first)');
 	const html = read('dist/index.html');
@@ -171,22 +178,23 @@ function links() {
 	for (const i of items()) {
 		const card = html.match(new RegExp(`data-item="${i.id}"[\\s\\S]*?</li>`))?.[0] ?? '';
 		const got = [...card.matchAll(/<a\b[^>]*class="more"[^>]*href="([^"]*)"|<a\b[^>]*href="([^"]*)"[^>]*class="more"/g)].map((m) => (m[1] ?? m[2]).replace(/&amp;/g, '&'));
-		if (got.length !== 1 || got[0] !== i.url) wrong.push(`${i.id}: page has ${got.join(' ') || 'no link'}, item file says ${i.url}`);
+		const want = [i.url, i.aboutUrl].filter(Boolean);
+		if (got.join(' ') !== want.join(' ')) wrong.push(`${i.id}: page has ${got.join(' ') || 'no link'}, item file says ${want.join(' ')}`);
 	}
-	wrong.length ? fail(`card links differ from the item files: ${wrong.join('; ')}`) : pass('every card links to the URL in its item file');
+	wrong.length ? fail(`card links differ from the item files: ${wrong.join('; ')}`) : pass('every card links to the URLs in its item file');
 }
 
 // Every outbound URL answers. From the built page when there is one (what visitors
 // click), else from the item files; plus every source page in CREDITS.md. One retry
-// on a network error or 5xx. A host answering a bot challenge (403 from Cloudflare)
-// cannot be judged from a script and is skipped with that reason, never passed.
+// on a network error or 5xx. A host answering a bot challenge (403 or 429 from
+// Cloudflare) cannot be judged from a script and is skipped with that reason, never passed.
 async function network() {
 	const urls = new Map();
 	const fromDist = process.argv[3] === 'dist' && existsSync('dist/index.html');
 	if (fromDist) {
 		for (const [, u] of read('dist/index.html').matchAll(/<a\b[^>]*\bhref="(https:[^"]+)"/g)) urls.set(u.replace(/&amp;/g, '&'), 'page');
 	} else {
-		for (const i of items()) if (i.url) urls.set(i.url, i.id);
+		for (const i of items()) for (const u of [i.url, i.aboutUrl]) if (u) urls.set(u, i.id);
 	}
 	for (const [, u] of read('CREDITS.md').matchAll(/\]\((https:[^)]+)\)/g)) urls.set(u, 'CREDITS.md');
 	const get = (u) => fetch(u, { redirect: 'follow', signal: AbortSignal.timeout(20000), headers: { 'user-agent': 'Mozilla/5.0 patriot-package-linkcheck' } });
@@ -198,7 +206,7 @@ async function network() {
 		}
 		if (r instanceof Error) fail(`${u} (${from}): ${r.cause?.code ?? r.message}`);
 		else if (r.ok) pass(`${r.status} ${u}`);
-		else if (r.status === 403 && (r.headers.get('cf-mitigated') || r.headers.get('server') === 'cloudflare')) skip(`${u} (${from}) answers a bot challenge; check it in a browser`);
+		else if ([403, 429].includes(r.status) && (r.headers.get('cf-mitigated') || r.headers.get('server') === 'cloudflare')) skip(`${u} (${from}) answers a bot challenge; check it in a browser`);
 		else fail(`${r.status} ${u} (${from})`);
 	}));
 	pass(`${urls.size} outbound URLs checked (${fromDist ? 'from the built page' : 'from the item files'} and CREDITS.md)`);

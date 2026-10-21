@@ -6,6 +6,10 @@ The site is unversioned (every push to `main` deploys).
 ## [Unreleased]
 
 ### Added
+- The history book is now a specific one: Andrew Prescott's "250 Years of American History" from
+  Proud Patriots, $99.99. Its card has a byline (author, pages, format), the seller's photo loaded
+  from their site, a buy link and the america250.org link. New optional item fields: `byline`,
+  `imageUrl` and `about` (DECISIONS #13, #14).
 - A public-domain photo on nine of the ten items, and a link on every item to an official page
   (National Archives, U.S. Mint, Library of Congress, NPS, Architect of the Capitol) where one
   exists. A bald eagle sits in the header. Sources and licenses are in `CREDITS.md`, linked from

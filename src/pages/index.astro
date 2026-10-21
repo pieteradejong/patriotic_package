@@ -52,7 +52,22 @@ const ideas = items.length - confirmed;
 					{g.items.map(async (item) => {
 						const { Content } = await render(item);
 						return (
-							<li class:list={['item', { 'has-image': item.data.image }]} data-item={item.id} data-status={item.data.status}>
+							<li class:list={['item', { 'has-image': item.data.image || item.data.imageUrl }]} data-item={item.id} data-status={item.data.status}>
+								{item.data.imageUrl && (
+									// The seller's photo, from their CDN: <Image> would copy it onto this site (DECISIONS #13).
+									<img
+										src={`${item.data.imageUrl}&width=800`}
+										srcset={`${item.data.imageUrl}&width=400 400w, ${item.data.imageUrl}&width=800 800w`}
+										sizes="(max-width: 600px) 100vw, 200px"
+										alt={item.data.imageAlt!}
+										width="800"
+										height="600"
+										loading="lazy"
+										decoding="async"
+										referrerpolicy="no-referrer"
+										class="photo"
+									/>
+								)}
 								{item.data.image && (
 									<Image
 										src={item.data.image}
@@ -66,12 +81,14 @@ const ideas = items.length - confirmed;
 									<div class="item-head">
 										{item.data.status === 'speculative' && <span class="badge" aria-label="Idea, not yet decided">Idea</span>}
 										<h3>{item.data.title}</h3>
+										{item.data.byline && <p class="byline">{item.data.byline}</p>}
 									</div>
 									<div class="item-body"><Content /></div>
 									{(item.data.priceUsd || item.data.link) && (
 										<p class="meta">
 											{item.data.priceUsd && <span>${item.data.priceUsd}</span>}
 											{item.data.link && <a href={item.data.link.url} rel="noopener" class="more">{item.data.link.label}</a>}
+											{item.data.about && <a href={item.data.about.url} rel="noopener" class="more">{item.data.about.label}</a>}
 										</p>
 									)}
 								</div>

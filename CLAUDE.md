@@ -28,9 +28,13 @@ https://patriot-package.vercel.app by Vercel's Git integration. Items are Markdo
 - Off Vercel, `/_vercel/insights/script.js` returns 404. The Playwright console-error test ignores
   that URL only.
 - Item photos: public domain or CC0 only, 800×600 WebP, and a row in `CREDITS.md` for each
-  (`docs/DECISIONS.md` #6). The schema refuses `image` without `imageAlt`.
+  (`docs/DECISIONS.md` #6). The one exception is the book's seller photo (#13). The schema refuses
+  an image without `imageAlt`.
 - usmint.gov and america250.org return 403 (a Cloudflare challenge) to `curl` and headless
-  Chromium. Check those links in a real browser.
+  Chromium. Check those links in a real browser. proudpatriots.com sometimes answers `429` from
+  Cloudflare; the link check skips that too.
+- The book's photo is hotlinked from the seller's CDN (`imageUrl`, `docs/DECISIONS.md` #13), so the
+  Playwright photo test needs the network even under `--offline`.
 - `typescript` is pinned to 6.0.3, not 7: `@astrojs/check` 0.9.10 declares `^5 || ^6`.
 - npm 11 does not run esbuild's or fsevents' install scripts (`allowScripts`), and CI installs
   with `--ignore-scripts`. Both builds work without them; don't approve them just to quiet the

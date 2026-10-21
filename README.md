@@ -16,7 +16,10 @@ category, and anything still undecided gets an "Idea" badge.
 | `status` | yes | `confirmed` (in the package) or `speculative` (an idea) |
 | `order` | yes | integer, sort order on the page |
 | `image`, `imageAlt` | no | a photo in `src/assets/items/` (public domain or CC0 only, listed in [CREDITS.md](CREDITS.md)) and its alt text, which is required with an image |
-| `link` | no | `url` and `label`: where to read about it or get it, from an official source where one exists |
+| `byline` | no | one line under the title, e.g. author, pages and format |
+| `imageUrl` | no | instead of `image`: the seller's own photo, loaded from their site, only on hosts in `HOTLINK_HOSTS` (`src/consts.ts`) and credited in [CREDITS.md](CREDITS.md) |
+| `link` | no | `url` and `label`: where to get it (a shop) or read about it |
+| `about` | no | `url` and `label`: a second link, to background from an official source |
 | `source`, `priceUsd` | no | where it comes from, a price in dollars |
 
 Photos are cropped to 4:3 WebP at 800×600 before they are committed. Astro serves 400px and 800px
