@@ -41,5 +41,8 @@ https://patriot-package.vercel.app by Vercel's Git integration. Items are Markdo
   warning.
 - A new check goes in `scripts/checks.mjs` when it is easier in Node. Print `PASS|FAIL|WARN|SKIP`,
   a tab, then the message; `test.sh` counts the lines.
+- The header images are generated: `scripts/header/make.sh` (macOS only: Vision, ImageMagick,
+  cwebp) rebuilds `src/assets/header-{flag,eagle}.webp`. The flag's mottling is random, so each
+  run gives a slightly different file.
 - Item categories are listed in `src/consts.ts`. Add a key there, or the schema rejects the
   file.

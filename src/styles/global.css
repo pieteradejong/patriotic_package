@@ -22,10 +22,6 @@ a { color: var(--blue); }
 a:focus-visible { outline: 3px solid var(--red); outline-offset: 2px; }
 /* Safe-area insets keep content clear of the notch in landscape (viewport-fit=cover). */
 .wrap { max-width: 46rem; margin: 0 auto; padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left)); }
-/* A row of pleated half-fan bunting hanging from the top edge (public/bunting.svg,
-   drawn for this site). Fans touch, so the row reads as one garland. */
-.bunting { height: 96px; background: url('/bunting.svg') center top / auto 96px repeat-x; }
-@media (max-width: 480px) { .bunting { height: 56px; background-size: auto 56px; } }
 .hero { padding-top: 3rem; padding-bottom: 1.5rem; }
 .eyebrow { margin: 0; color: var(--red); font: 600 0.85rem/1 system-ui, sans-serif; letter-spacing: 0.15em; text-transform: uppercase; }
 h1 { margin: 0.4rem 0 0.6rem; color: var(--blue); font-size: clamp(2.2rem, 7vw, 3.4rem); line-height: 1.1; }
@@ -62,11 +58,12 @@ footer a { display: inline-block; padding: 0.6rem 0; }
 	.jump ul { flex-wrap: wrap; overflow: visible; }
 }
 
-/* Eagle banner under the bunting: a fixed, short band (130px on phones up to
-   260px). The whole photo shows at that height, centred on its own flat sky
-   colour, with its edges faded in so there is no seam. The eagle is never cut. */
-.banner-wrap { height: clamp(130px, 20vw, 260px); background: #c9cbdb; border-bottom: 4px solid var(--blue); }
-.banner { display: block; height: 100%; width: auto; max-width: 100%; margin: 0 auto; object-fit: contain; -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+/* Header: a waving flag fills the band (cover; the canton stays at the left) and the
+   cut-out eagle sits on it, whole, at nearly the band's height (contain, never cut).
+   140px on phones up to 280px. Both images come from scripts/header/make.sh. */
+.banner-wrap { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; height: clamp(140px, 22vw, 280px); background: var(--blue); border-bottom: 4px solid var(--blue); }
+.banner-flag { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: left 35%; }
+.banner { position: relative; display: block; height: 92%; width: auto; max-width: 96%; object-fit: contain; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.45)); }
 
 /* Cards with a photo: photo on top on phones, at the left from 601px. The card's
    own padding is cancelled so the photo runs edge to edge. */

@@ -33,6 +33,10 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- The header is now a bald eagle with its wings spread, cut out and set in front of a waving US
+  flag, 140px tall on phones and up to 280px on desktop. It replaces the eagle-in-flight photo
+  on its sky and the row of bunting fans, which is removed from every page, the 404 included.
+  `scripts/header/make.sh` rebuilds both images (DECISIONS #15).
 - The eagle banner is a short fixed band: 130px on phones, up to 260px on desktop, instead of up to
   about 460px. The whole photo is shown, centred on its sky colour with faded edges, so the eagle
   is never cropped, and the title now sits near the top of the screen (DECISIONS #11).

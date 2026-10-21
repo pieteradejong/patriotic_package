@@ -84,7 +84,7 @@ test('photos load, have alt text and fit their card', async ({ page }) => {
 		expect(box.x + box.width).toBeLessThanOrEqual(card.x + card.width + 1);
 	}
 	const banner = page.locator('img.banner');
-	await expect(banner).toHaveAttribute('alt', 'A bald eagle in flight');
+	await expect(banner).toHaveAttribute('alt', 'A bald eagle with its wings spread, in front of the American flag');
 	await expect.poll(() => banner.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
 });
 
@@ -106,31 +106,23 @@ test('the header counts match the cards and explain the Idea badge', async ({ pa
 	await expect(count).toContainText(`${ideas} more are ideas still being decided, each marked Idea.`);
 });
 
-test('the eagle banner spans the page directly under the bunting', async ({ page }) => {
+test('the eagle-and-flag banner spans the top of the page', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.locator('img.banner')).toBeVisible();
 	const banner = (await page.locator('.banner-wrap').boundingBox())!;
 	const width = page.viewportSize()!.width;
+	expect(banner.y).toBe(0);
 	expect(banner.width).toBeGreaterThanOrEqual(width - 1);
-	// Directly under the bunting, nothing in between.
-	const bunting = (await page.locator('.bunting').boundingBox())!;
-	expect(Math.abs(banner.y - (bunting.y + bunting.height))).toBeLessThanOrEqual(1);
-	// Short band: 130px on phones, at most 260px (+4px border) on desktop.
-	expect(banner.height).toBeGreaterThanOrEqual(130);
-	expect(banner.height).toBeLessThanOrEqual(265);
-	// The whole photo is shown, never cropped (contain letterboxes onto the sky colour).
+	// Short band: 140px on phones, at most 280px (+4px border) on desktop.
+	expect(banner.height).toBeGreaterThanOrEqual(140);
+	expect(banner.height).toBeLessThanOrEqual(285);
+	// The flag fills the band; the eagle is whole (contain) and inside it.
+	const flag = (await page.locator('img.banner-flag').boundingBox())!;
+	expect(flag.width).toBeGreaterThanOrEqual(width - 1);
 	await expect(page.locator('img.banner')).toHaveCSS('object-fit', 'contain');
-});
-
-test('bunting hangs across the top of every page', async ({ page, request }) => {
-	expect((await request.get('/bunting.svg')).status()).toBe(200);
-	for (const path of ['/', '/this-page-does-not-exist']) {
-		await page.goto(path);
-		const bunting = page.locator('.bunting');
-		await expect(bunting).toHaveCSS('background-image', /bunting\.svg/);
-		const box = (await bunting.boundingBox())!;
-		expect(box.y).toBe(0);
-		expect(box.width).toBeGreaterThanOrEqual(page.viewportSize()!.width - 1);
-		expect(box.height).toBeGreaterThanOrEqual(50);
-	}
+	const eagle = (await page.locator('img.banner').boundingBox())!;
+	expect(eagle.x).toBeGreaterThanOrEqual(banner.x);
+	expect(eagle.x + eagle.width).toBeLessThanOrEqual(banner.x + banner.width);
+	expect(eagle.y + eagle.height).toBeLessThanOrEqual(banner.y + banner.height);
+	expect(eagle.height).toBeGreaterThanOrEqual(banner.height * 0.85);
 });

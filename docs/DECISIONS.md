@@ -244,3 +244,32 @@ once. Rejected: putting the second link in the Markdown body, which the link che
 - `./test.sh --offline` → `118 passed, 0 failed`.
 - Changing the about URL in `dist/index.html` → `FAIL card links differ from the item files:
   american-history-book: …`. Restored → `PASS every card links to the URLs in its item file`.
+
+## 15. The header is a cut-out eagle on a drawn flag; the bunting is removed (supersedes #9–#11)
+**Date:** 2026-10-21
+**Context:** Pieter: the repeated bunting fans at the top looked amateurish, and the eagle looked
+meager. Pieter's reference was a painted eagle, wings spread toward the viewer, over a weathered
+flag: the cover art of the Prescott book (#13).
+**Decision:** Two layers in one band, `clamp(140px, 22vw, 280px)` tall:
+- `src/assets/header-flag.webp` (2000×720): a US flag drawn by `scripts/header/make.sh`. Folds
+  come from sine waves, with shading, mottling, grain and a vignette. It fills the band with
+  `object-fit: cover`, canton at the left.
+- `src/assets/header-eagle.webp` (1600×648, alpha): "Bald Eagle on Seedskadee NWR", Tom
+  Koerner/USFWS, public domain. It is the closest Commons match to the reference: wings spread,
+  nearly facing the viewer, talons down. macOS Vision cut it out of its sky. The script then
+  makes sky-blue edge pixels transparent. It is shown whole (`contain`) at 92% of the band's
+  height, with a drop shadow.
+The bunting (`public/bunting.svg`) and the old banner photo are deleted. Rejected:
+- Using the reference image: it is the book's copyrighted art (#6).
+- A drawn or vector eagle: the CC0 one on Commons is a flat silhouette, which reads as clip art.
+- Keeping the bunting above the new banner: it was the part Pieter called amateurish, and two
+  flag motifs stacked compete.
+- One composite image: a wide crop that keeps the eagle whole on desktop cuts its wings on phones.
+  With two layers, only the flag is cropped.
+**Verified:**
+- `./test.sh` → `137 passed, 0 failed, 1 warnings, 4 skipped`, including `the eagle-and-flag
+  banner spans the top of the page` at 1280, 375 and 320px. That test checks the eagle sits
+  whole inside the band at ≥ 85% of its height. Also `src/assets/header-flag.webp (40 KB)` and
+  `src/assets/header-eagle.webp (56 KB)` at their expected sizes.
+- `scripts/header/make.sh` rebuilds both files in about 11 s. `shellcheck` is clean.
+- Screenshots at 375, 1280 and 1920px show the whole eagle, wingtips to talons, on the flag.

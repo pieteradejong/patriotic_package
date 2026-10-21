@@ -318,7 +318,7 @@ fi
 
 if [ "$BUILT" = 1 ]; then
 	section "Output"
-	for f in index.html 404.html sitemap-index.xml robots.txt favicon.svg bunting.svg; do
+	for f in index.html 404.html sitemap-index.xml robots.txt favicon.svg; do
 		[ -f "dist/$f" ] && pass "dist/$f" || fail "dist/$f missing"
 	done
 	count=0; missing=""
