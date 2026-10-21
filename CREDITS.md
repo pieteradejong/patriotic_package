@@ -10,7 +10,7 @@ The source page has the full provenance.
 | `src/assets/items/capitol-flag.webp` | Public domain | USCapitol | [Commons](https://commons.wikimedia.org/wiki/File:Flickr_-_USCapitol_-_Flag_Flying_on_the_U.S._Capitol.jpg) |
 | `src/assets/items/constitution.webp` | Public domain | Constitutional Convention | [Commons](https://commons.wikimedia.org/wiki/File:United_States_Constitution.jpg) |
 | `src/assets/items/declaration-of-independence.webp` | No restrictions | The U.S. National Archives | [Commons](https://commons.wikimedia.org/wiki/File:Engrossed_Declaration_of_Independence_%283678682267%29.jpg) |
-| `src/assets/header-eagle.webp` | Public domain | Tom Koerner, U.S. Fish and Wildlife Service | [Commons](https://commons.wikimedia.org/wiki/File:Bald_Eagle_on_Seedskadee_NWR_%2823695399363%29.jpg) |
+| `src/assets/header-eagle.webp` | Public domain | Lisa Hupp, U.S. Fish and Wildlife Service | [Commons](https://commons.wikimedia.org/wiki/File:Bald_eagle_in_flight_%2851080613667%29.jpg) |
 | `src/assets/items/federalist-papers.webp` | Public domain | Publius (pseudonym) [Alexander Hamilton, John Jay, James Madison]. | [Commons](https://commons.wikimedia.org/wiki/File:The_Federalist_%281st_ed,_1788,_vol_I,_title_page%29.jpg) |
 | `src/assets/items/founding-era-timeline.webp` | Public domain | John Trumbull | [Commons](https://commons.wikimedia.org/wiki/File:Declaration_of_Independence_%281819%29,_by_John_Trumbull.jpg) |
 | `src/assets/items/historical-newspaper.webp` | Public domain | Pennsylvania Evening Post | [Commons](https://commons.wikimedia.org/wiki/File:Declaration_First_Newspaper_Printing.jpg) |

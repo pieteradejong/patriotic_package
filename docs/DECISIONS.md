@@ -273,3 +273,29 @@ The bunting (`public/bunting.svg`) and the old banner photo are deleted. Rejecte
   `src/assets/header-eagle.webp (56 KB)` at their expected sizes.
 - `scripts/header/make.sh` rebuilds both files in about 11 s. `shellcheck` is clean.
 - Screenshots at 375, 1280 and 1920px show the whole eagle, wingtips to talons, on the flag.
+
+## 16. The header eagle faces the viewer and is larger (supersedes #15's photo and sizing)
+**Date:** 2026-10-21
+**Context:** Pieter: the eagle should look you in the eye, be somewhat larger, and have its wings
+spread. The #15 photo shows it in three-quarter view, head turned away.
+**Decision:** "Bald eagle in flight" (51080613667), Lisa Hupp/USFWS, Public Domain Mark. It is
+photographed from below, flying at the camera, both eyes on the lens, wings fully spread. The
+search covered 752 files in five Commons eagle-in-flight categories; 86 were public domain or CC0
+at 1500px or wider. `scripts/header/make.sh` cuts it out and keys the sky. It keys only along the
+outline, plus pixels both bright and strongly blue (blue minus red > 0.25), because skylight
+turns the underwing and the white neck blue. It turns the bird 14° so the wings are level. The
+band grows to `clamp(160px, 25vw, 320px)` and the eagle to 96% of it. #15's flag, layering and
+cover/contain split stand. Rejected:
+- "Ready to Take Flight" (4819447648), a perched eagle staring into the camera with wings raised:
+  the strongest stare, but it is credited to a contractor (Rich Keen, DPRA Inc.) and also tagged
+  CC BY 2.0, so its public-domain status is doubtful (#6).
+- "Bald Eagle" (8601174760), head-on with wings in a V: 1979px with a small bird, head turned
+  slightly away.
+**Verified:**
+- `./test.sh` → `137 passed, 0 failed, 1 warnings, 4 skipped`, including `the eagle-and-flag
+  banner spans the top of the page` at 1280, 375 and 320px (band 160–325px, eagle whole and
+  ≥ 85% of its height), and `src/assets/header-eagle.webp (82 KB)` at 1600×636.
+- Commons wikitext for the new photo: `{{PD-USGov-FWS}}`, FlickreviewR `Public Domain Mark`,
+  credit `Lisa Hupp/USFWS`.
+- Screenshots at 375, 1280 and 1920px show the whole eagle, level, facing the viewer, eyes and
+  beak sharp.

@@ -33,6 +33,9 @@ The site is unversioned (every push to `main` deploys).
   checks (DECISIONS #4).
 
 ### Changed
+- The header eagle now flies straight at the viewer, wings spread level and wide, looking you in
+  the eye, and is larger: the band is 160px on phones and up to 320px on desktop, and the eagle
+  fills 96% of it (DECISIONS #16).
 - The header is now a bald eagle with its wings spread, cut out and set in front of a waving US
   flag, 140px tall on phones and up to 280px on desktop. It replaces the eagle-in-flight photo
   on its sky and the row of bunting fans, which is removed from every page, the 404 included.

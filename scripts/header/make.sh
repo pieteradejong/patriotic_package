@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Rebuilds the two header images (docs/DECISIONS.md #15):
 #   src/assets/header-flag.webp   a waving, shaded US flag drawn here (no source image)
-#   src/assets/header-eagle.webp  the USFWS eagle photo, cut out with macOS Vision
+#   src/assets/header-eagle.webp  a USFWS eagle photo, cut out with macOS Vision
 # Needs macOS 14+ (Vision), ImageMagick 7, cwebp, python3, swift. Work files go to a temp dir.
 set -euo pipefail
 
@@ -10,7 +10,7 @@ here=scripts/header
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 
-src_url='https://upload.wikimedia.org/wikipedia/commons/2/23/Bald_Eagle_on_Seedskadee_NWR_%2823695399363%29.jpg'
+src_url='https://upload.wikimedia.org/wikipedia/commons/a/a3/Bald_eagle_in_flight_%2851080613667%29.jpg'
 
 # Flag: 13 stripes, a canton seven stripes tall, 50 stars, at 2400x1000.
 python3 - "$work/flag.svg" <<'EOF'
@@ -55,14 +55,19 @@ magick "$work/waved.png" "$work/light.png" -fx 'u*v.r' -modulate 100,78 \
 	-resize 2000x -crop 2000x720+0+50 +repage PNG24:"$work/flag.png"
 cwebp -quiet -q 72 -m 6 "$work/flag.png" -o src/assets/header-flag.webp
 
-# Eagle: cut out with Vision, then sky-blue edge pixels made transparent (nothing on a
-# bald eagle is bluer than it is red), the mask eroded a little, and leftover tint greyed.
+# Eagle: cut out with Vision. Seen from below, its underside is lit blue by the sky, so the
+# blue key is applied only near the outline (a band about 10px wide at full size) plus wherever
+# a pixel is both bright and strongly blue (sky between the wingtip feathers). Then the mask
+# is eroded a little, bluish pixels are pulled halfway to grey, and the bird is turned 14°
+# counter-clockwise so its wings are level.
 curl -fsSL -A 'patriot-package header build' -o "$work/eagle.jpg" "$src_url"
 swift "$here/lift.swift" "$work/eagle.jpg" "$work/cut.png"
-magick "$work/cut.png" -channel A -fx 'a*(1-min(1,max(0,(b-r-0.06)*5)))' +channel \
+magick "$work/cut.png" -alpha extract -threshold 50% -morphology Erode Disk:10 -blur 0x3 "$work/interior.png"
+magick "$work/cut.png" "$work/interior.png" -channel A \
+	-fx 'u.a*(1-(1-v.r)*min(1,max(0,(u.b-u.r-0.06)*5)))*(1-min(1,max(0,(u.b-u.r-0.25)*10))*min(1,max(0,(u.b-0.55)*8)))' +channel \
 	\( +clone -alpha extract -morphology Erode Disk:1.5 -blur 0x0.8 \) -compose CopyOpacity -composite \
-	-channel RGB -fx 'b>r ? 0.97*(0.3*r+0.59*g+0.11*b) : u' +channel \
-	-trim +repage -resize 1600x PNG32:"$work/eagle.png"
+	-channel RGB -fx 'b>r ? 0.5*u+0.5*(0.3*r+0.59*g+0.11*b) : u' +channel \
+	-background none -rotate -14 -trim +repage -resize 1600x PNG32:"$work/eagle.png"
 cwebp -quiet -q 82 -alpha_q 90 -m 6 "$work/eagle.png" -o src/assets/header-eagle.webp
 
 magick identify src/assets/header-flag.webp src/assets/header-eagle.webp

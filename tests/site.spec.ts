@@ -84,7 +84,7 @@ test('photos load, have alt text and fit their card', async ({ page }) => {
 		expect(box.x + box.width).toBeLessThanOrEqual(card.x + card.width + 1);
 	}
 	const banner = page.locator('img.banner');
-	await expect(banner).toHaveAttribute('alt', 'A bald eagle with its wings spread, in front of the American flag');
+	await expect(banner).toHaveAttribute('alt', 'A bald eagle flying straight at the viewer, wings spread wide, in front of the American flag');
 	await expect.poll(() => banner.evaluate((i: HTMLImageElement) => i.complete && i.naturalWidth > 0)).toBe(true);
 });
 
@@ -113,9 +113,9 @@ test('the eagle-and-flag banner spans the top of the page', async ({ page }) => 
 	const width = page.viewportSize()!.width;
 	expect(banner.y).toBe(0);
 	expect(banner.width).toBeGreaterThanOrEqual(width - 1);
-	// Short band: 140px on phones, at most 280px (+4px border) on desktop.
-	expect(banner.height).toBeGreaterThanOrEqual(140);
-	expect(banner.height).toBeLessThanOrEqual(285);
+	// Short band: 160px on phones, at most 320px (+4px border) on desktop.
+	expect(banner.height).toBeGreaterThanOrEqual(160);
+	expect(banner.height).toBeLessThanOrEqual(325);
 	// The flag fills the band; the eagle is whole (contain) and inside it.
 	const flag = (await page.locator('img.banner-flag').boundingBox())!;
 	expect(flag.width).toBeGreaterThanOrEqual(width - 1);

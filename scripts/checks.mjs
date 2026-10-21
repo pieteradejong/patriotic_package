@@ -21,7 +21,7 @@ const ITEMS_DIR = 'src/content/items';
 const IMAGE_BUDGET_KB = 120;
 const CARD_SIZE = [800, 600];
 // Header images and their sizes (scripts/header/make.sh).
-const HEADER = { 'src/assets/header-flag.webp': [2000, 720], 'src/assets/header-eagle.webp': [1600, 648] };
+const HEADER = { 'src/assets/header-flag.webp': [2000, 720], 'src/assets/header-eagle.webp': [1600, 636] };
 const HOLDER = 'Pieter de Jong';
 
 // Minimal frontmatter reader: the item files use flat keys plus nested `link` and `about`.

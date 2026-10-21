@@ -59,11 +59,11 @@ footer a { display: inline-block; padding: 0.6rem 0; }
 }
 
 /* Header: a waving flag fills the band (cover; the canton stays at the left) and the
-   cut-out eagle sits on it, whole, at nearly the band's height (contain, never cut).
-   140px on phones up to 280px. Both images come from scripts/header/make.sh. */
-.banner-wrap { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; height: clamp(140px, 22vw, 280px); background: var(--blue); border-bottom: 4px solid var(--blue); }
+   cut-out eagle sits on it, whole, at 96% of the band's height (contain, never cut).
+   160px on phones up to 320px. Both images come from scripts/header/make.sh. */
+.banner-wrap { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; height: clamp(160px, 25vw, 320px); background: var(--blue); border-bottom: 4px solid var(--blue); }
 .banner-flag { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: left 35%; }
-.banner { position: relative; display: block; height: 92%; width: auto; max-width: 96%; object-fit: contain; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.45)); }
+.banner { position: relative; display: block; height: 96%; width: auto; max-width: 96%; object-fit: contain; filter: drop-shadow(0 6px 10px rgb(0 0 0 / 0.45)); }
 
 /* Cards with a photo: photo on top on phones, at the left from 601px. The card's
    own padding is cancelled so the photo runs edge to edge. */
